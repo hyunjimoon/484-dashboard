@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>민음사 세계문학전집 484권 — 창업 교육을 위한 독서 지도</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap');
+        :root {
+            --bg: #0a0e1a; --surface: #111827; --card: #1a2234;
+            --border: rgba(255,255,255,0.06);
+            --text: #f0f2f5; --text2: #94a3b8; --dim: #64748b; --muted: #475569;
+            --blue: #3b82f6; --violet: #8b5cf6; --pink: #ec4899;
+            --gold: #f59e0b; --emerald: #10b981; --cyan: #06b6d4; --rose: #f43f5e; --sky: #38bdf8;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans','Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.6; overflow-x:hidden; }
+
+        /* HEADER */
+        .header { display:flex; justify-content:space-between; align-items:center; padding:20px 32px 12px; }
+        .header h1 { font-size:20px; font-weight:700; letter-spacing:-0.5px; }
+        .header h1 span { font-weight:300; color:var(--dim); font-size:13px; margin-left:8px; }
+        .header .author { font-size:13px; color:var(--dim); }
+
+        /* KPI */
+        .kpi { text-align:center; padding:4px 0 16px; font-family:'DM Mono',monospace; font-size:15px; color:var(--text2); letter-spacing:0.5px; }
+        .kpi b { font-size:22px; font-weight:500; }
+        .kpi .n-analyzed { background:linear-gradient(135deg,var(--emerald),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .kpi .n-total { background:linear-gradient(135deg,var(--blue),var(--violet)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .kpi .n-pattern { background:linear-gradient(135deg,var(--gold),#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+        /* MOSAIC */
+        .mosaic-wrap { padding:0 16px; }
+        .mosaic { display:grid; grid-template-columns:repeat(22,1fr); gap:2px; max-width:880px; margin:0 auto; }
+        .cell {
+            aspect-ratio:1; border-radius:3px; cursor:pointer; position:relative;
+            display:flex; align-items:center; justify-content:center;
+            font-family:'DM Mono',monospace; font-size:8px; color:rgba(255,255,255,0.25);
+            transition:transform 0.15s, box-shadow 0.15s;
+        }
+        .cell:hover { transform:scale(1.8); z-index:10; box-shadow:0 0 12px rgba(255,255,255,0.2); }
+        .cell-empty { background:#0f1525; }
+        .cell-catalog { background:#1a1f3a; }
+        .cell-tension { background:rgba(244,63,94,0.25); border:1px solid rgba(244,63,94,0.15); }
+        .cell-ilryeok { background:rgba(16,185,129,0.4); border:1px solid rgba(16,185,129,0.3); }
+        .cell-tv { background:rgba(245,158,11,0.4); border:1px solid rgba(245,158,11,0.3); }
+        .cell-both { background:linear-gradient(135deg,rgba(16,185,129,0.5),rgba(245,158,11,0.5)); border:1px solid rgba(255,255,255,0.15); }
+        .cell .crown { position:absolute; top:-2px; right:-1px; font-size:7px; }
+        .cell .check { position:absolute; bottom:0; right:0; font-size:6px; color:var(--emerald); }
+
+        /* LEGEND */
+        .legend { display:flex; justify-content:center; gap:16px; padding:12px 0 8px; flex-wrap:wrap; }
+        .legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--dim); }
+        .legend-dot { width:10px; height:10px; border-radius:2px; }
+
+        /* QUIZ */
+        .quiz-wrap { max-width:600px; margin:8px auto 0; padding:0 16px 24px; }
+        .quiz-btn {
+            width:100%; padding:14px; border:1px solid var(--border); background:var(--card);
+            color:var(--text2); border-radius:12px; cursor:pointer; font-size:14px; font-family:inherit;
+            transition:all 0.2s;
+        }
+        .quiz-btn:hover { background:rgba(59,130,246,0.1); border-color:var(--blue); color:var(--text); }
+        .quiz-area { display:none; margin-top:12px; }
+        .quiz-area.active { display:block; }
+        .quiz-question { background:var(--card); border-radius:12px; padding:20px; margin-bottom:12px; border:1px solid var(--border); }
+        .quiz-q-title { font-size:13px; color:var(--dim); margin-bottom:8px; }
+        .quiz-q-book { font-size:18px; font-weight:600; margin-bottom:4px; }
+        .quiz-q-author { font-size:13px; color:var(--text2); }
+        .quiz-q-tragedy { font-size:13px; color:var(--rose); margin-top:8px; display:none; }
+        .quiz-options { display:grid; gap:8px; }
+        .quiz-opt {
+            padding:12px 16px; border:1px solid var(--border); background:var(--surface);
+            border-radius:8px; cursor:pointer; font-size:13px; color:var(--text2);
+            transition:all 0.15s; text-align:left; font-family:inherit;
+        }
+        .quiz-opt:hover { border-color:var(--blue); background:rgba(59,130,246,0.05); }
+        .quiz-opt.correct { border-color:var(--emerald); background:rgba(16,185,129,0.1); color:var(--emerald); }
+        .quiz-opt.wrong { border-color:var(--rose); background:rgba(244,63,94,0.1); color:var(--rose); }
+        .quiz-opt.reveal { border-color:var(--emerald); opacity:0.7; }
+        .quiz-score { text-align:center; font-size:12px; color:var(--dim); margin-top:8px; font-family:'DM Mono',monospace; }
+        .quiz-next { display:none; margin-top:10px; width:100%; padding:10px; border:1px solid var(--blue); background:transparent; color:var(--blue); border-radius:8px; cursor:pointer; font-family:inherit; font-size:13px; }
+        .quiz-next:hover { background:rgba(59,130,246,0.1); }
+
+        /* TOOLTIP */
+        .tooltip {
+            display:none; position:fixed; z-index:1000;
+            background:rgba(17,24,39,0.97); border:1px solid rgba(255,255,255,0.1);
+            border-radius:12px; padding:14px; width:240px;
+            box-shadow:0 8px 32px rgba(0,0,0,0.5); pointer-events:none;
+        }
+        .tooltip.show { display:block; }
+        .tooltip img { width:80px; height:auto; border-radius:4px; float:left; margin-right:10px; margin-bottom:4px; }
+        .tooltip .t-vol { font-family:'DM Mono',monospace; font-size:11px; color:var(--dim); }
+        .tooltip .t-title { font-size:15px; font-weight:600; margin:2px 0; }
+        .tooltip .t-author { font-size:12px; color:var(--text2); margin-bottom:6px; }
+        .tooltip .t-line { clear:both; font-size:12px; color:var(--gold); border-top:1px solid var(--border); padding-top:6px; margin-top:6px; font-style:italic; }
+        .tooltip .t-tension { font-size:11px; color:var(--rose); margin-top:4px; }
+
+        /* MODAL */
+        .modal-overlay {
+            display:none; position:fixed; inset:0; z-index:2000;
+            background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+            align-items:center; justify-content:center;
+        }
+        .modal-overlay.show { display:flex; }
+        .modal {
+            background:var(--surface); border:1px solid var(--border); border-radius:16px;
+            width:90%; max-width:480px; max-height:85vh; overflow-y:auto; padding:28px;
+            box-shadow:0 16px 64px rgba(0,0,0,0.5);
+        }
+        .modal::-webkit-scrollbar { width:4px; }
+        .modal::-webkit-scrollbar-thumb { background:var(--card); border-radius:2px; }
+        .modal h2 { font-size:18px; margin-bottom:4px; }
+        .modal .m-author { font-size:13px; color:var(--text2); margin-bottom:16px; }
+        .modal .m-section { margin-bottom:14px; }
+        .modal .m-label { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:var(--dim); margin-bottom:4px; }
+        .modal .m-pattern { font-size:14px; color:var(--rose); }
+        .modal .m-tragedy { font-size:13px; color:var(--text2); margin-top:2px; }
+        .modal .m-tv-item { font-size:13px; color:var(--text2); margin:2px 0; }
+        .modal .m-tv-item .medal { margin-right:4px; }
+        .modal .m-quote { font-size:13px; color:var(--gold); font-style:italic; padding:10px; background:var(--card); border-radius:8px; border-left:3px solid var(--gold); }
+        .modal .m-memo { font-size:12px; color:var(--text2); padding:8px 10px; background:var(--card); border-radius:8px; border-left:3px solid var(--violet); }
+        .modal .m-tension { font-size:13px; color:var(--rose); font-style:italic; }
+        .modal .m-close { display:block; margin-top:16px; width:100%; padding:10px; border:1px solid var(--border); background:transparent; color:var(--text2); border-radius:8px; cursor:pointer; font-family:inherit; }
+        .modal .m-close:hover { background:var(--card); }
+
+        /* FOOTER */
+        .footer { text-align:center; padding:12px; font-size:10px; color:var(--muted); border-top:1px solid var(--border); margin-top:8px; }
+
+        @media(max-width:600px) {
+            .mosaic { grid-template-columns:repeat(22,1fr); gap:1px; }
+            .cell { font-size:6px; }
+            .header { flex-direction:column; gap:4px; text-align:center; }
+            .tooltip { width:200px; }
+            .modal { width:95%; padding:20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>민음사 세계문학전집 484권<span>창업 교육을 위한 독서 지도</span></h1>
+    <div class="author">문현지</div>
+</div>
+
+<div class="kpi">
+    <b class="n-analyzed">29</b> 권 분석 완료 &middot;
+    <b class="n-total">477</b> 권 수록 &middot;
+    <b class="n-pattern">10</b> 가지 창업 실패 패턴 &middot;
+    <b style="background:linear-gradient(135deg,var(--rose),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent">67</b> 편의 보는 힘↔행동하는 힘 긴장
+</div>
+
+<div class="mosaic-wrap">
+    <div class="mosaic" id="mosaic"></div>
+</div>
+
+<div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:linear-gradient(135deg,rgba(16,185,129,0.6),rgba(245,158,11,0.6))"></div>커리큘럼 수록+TV 소개</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(16,185,129,0.5)"></div>커리큘럼 수록</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(245,158,11,0.5)"></div>민음사TV 소개</div>
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(244,63,94,0.25)"></div>창업 패턴 분석 완료</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1a1f3a"></div>미분석</div>
+</div>
+
+<div class="quiz-wrap">
+    <button class="quiz-btn" id="quizToggle">📖 5개월 커리큘럼에서 이 책은 몇 월? — 퀴즈 시작</button>
+    <div class="quiz-area" id="quizArea">
+        <div class="quiz-question" id="quizQ"></div>
+        <div class="quiz-options" id="quizOpts"></div>
+        <button class="quiz-next" id="quizNext">다음 문제</button>
+        <div class="quiz-score" id="quizScore"></div>
+    </div>
+</div>
+
+<div class="footer">창업은 오뒷세이아다 — 헌신과 자유, 확신과 겸손, 보는 힘과 행동하는 힘 사이의 끝없는 항해 &nbsp;|&nbsp; 484권의 판단력 시뮬레이터</div>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modal"></div></div>
+
+<script>
+// ============================================================
+// COVERS — 461 authoritative URLs from 세계문학전집/*.md
+// ============================================================
+const COVERS={1:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/001_변신-이야기11-300x507.jpg",2:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/002_변신-이야기21-300x508.jpg",3:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/003_햄릿-300x507.jpg",4:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/004_변신-시골의사-300x506.jpg",5:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/005_동물농장-300x508.jpg",6:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/006_허클베리핀의-모험-300x508.jpg",7:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/007_암흑의-핵심-300x505.jpg",8:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/008_토니오-크뢰거-트리스탄-300x504.jpg",9:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/009_문학이란-무엇인가-300x506.jpg",10:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/010_한국단편문학선11-300x505.jpg",11:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/011_인간의-굴레에서1-300x507.jpg",12:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/012_인간의-굴레에서2-300x508.jpg",13:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/013_이반-데니소비치-300x505.jpg",14:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/014_너새니얼-호손-300x508.jpg",15:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/015_나의-미카엘-300x507.jpg",16:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/016_중국신화전설1-300x505.jpg",17:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/017_중국신화전설2-300x505.jpg",18:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/018_고리오-영감-300x505.jpg",19:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/019_파리대왕-300x505.jpg",20:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/020_한국단편문학선2_표지최종1-300x505.jpg",21:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/021_파우스트1-300x505.jpg",22:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/022_파우스트2-300x506.jpg",23:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/023_빌헬름-마이스터의-수업시대1-300x506.jpg",24:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/024_빌헬름-마이스터의-수업시대2-300x505.jpg",25:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/025_젊은-베르테르의-슬픔-300x504.jpg",26:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/026_이피게니에-스텔라-300x507.jpg",27:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/027_다섯째-아이-300x506.jpg",28:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/028_삶의-한가운데-300x507.jpg",29:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/029_농담-300x505.jpg",30:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/030_야성의-부름-300x506.jpg",31:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/031_아메리칸-300x503.jpg",32:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/032_양철북1-300x504.jpg",33:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/033_양철북2-300x504.jpg",34:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/034_백년의-고독1-300x505.jpg",35:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/035_백년의-고독2-300x505.jpg",36:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/036_마담-보바리-300x505.jpg",37:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/037_거미여인의-키스-300x504.jpg",38:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/38_달과-6펜스_표1-300x510.jpg",39:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/039_폴란드의-풍차-300x505.jpg",40:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/040_독일어-시간1-300x504.jpg",41:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/041_독일어-시간2-300x505.jpg",42:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/042_말테의-수기-300x505.jpg",43:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/043_고도를-기다리며-300x505.jpg",44:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/044_데미안-300x504.jpg",45:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/045_젊은-예술가의-초상-300x503.jpg",46:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/046_카탈로니아-찬가-300x507.jpg",47:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/호밀밭새번역_B_표1-300x511.jpg",48:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/048_파르마의수도원1-300x504.jpg",49:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/049_파르마의-수도원2-300x506.jpg",50:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/050_수레바퀴-아래서-300x505.jpg",53:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/053_오셀로-300x505.jpg",54:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/054_조서-300x503.jpg",56:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/056_부덴브로크-가의-사람들1-300x504.jpg",57:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/057_부덴브로크-가의-사람들2-300x504.jpg",59:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/059_아들과-연인1-300x506.jpg",60:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/060_아들과-연인2-300x504.jpg",61:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/061_설국-300x511.jpg",62:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/062_벨킨이야기.스페이드여왕-300x511.jpg",63:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/063_넙치1-300x511.jpg",64:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/064_넙치2-300x511.jpg",65:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/065_소망없는불행-300x511.jpg",67:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/067_황야의이리-300x511.jpg",68:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/68-페테르부르크-이야기_표1-300x510.jpg",69:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/069_밤으로의긴여로-300x511.jpg",70:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/070_체호프단편선-300x511.jpg",71:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/071_버스정류장-300x511.jpg",72:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/072_구운몽-300x511.jpg",73:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/073_대머리여가수-300x511.jpg",74:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/074_이솝우화집-300x511.jpg",75:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/075_위대한개츠비-300x511.jpg",76:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/076_푸른꽃-300x511.jpg",77:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/077_1984-300x511.jpg",78:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/078_영혼의집1-300x511.jpg",79:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/079_영혼의집2-300x511.jpg",80:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/080_첫사랑-300x511.jpg",81:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/081_내가죽어누워있을때-300x511.jpg",82:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/082_런던스케치-300x511.jpg",83:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/083_팡세-300x511.jpg",84:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/084_질투-300x511.jpg",85:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/085_채털리부인의연인1-300x511.jpg",86:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/086_채털리부인의연인2-300x511.jpg",87:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/087_그후-300x511.jpg",88:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/088_오만과현견-300x511.jpg",89:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집89_부활1_표1-300x511.jpg",90:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집90_부활2_표1-300x511.jpg",91:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/091_방드르디태평양의끝-300x511.jpg",92:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/092_미겔스트리트-300x511.jpg",93:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/페드로-파라모_표1-300x509.jpg",94:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/094_차라투스트라는이렇게말했다-300x511.jpg",96:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/096_적과흑2-300x511.jpg",97:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/097_콜레라시대의사랑1-300x511.jpg",98:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/098_콜레라시대의사랑2-300x511.jpg",99:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/099_맥베스-300x511.jpg",100:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/100_춘향전-300x511.jpg",101:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/101_페르디두르케-300x511.jpg",102:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/102_포르노그라피아-300x511.jpg",103:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/103_인간실격-300x511.jpg",104:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/104_네루다의우편배달부-300x511.jpg",105:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/105_이탈리아기행1-300x511.jpg",106:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/106_이탈리아기행2-300x511.jpg",107:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/107_나무위의남작-300x511.jpg",108:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/달콤초콜릿_표지-1-300x511.jpg",109:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/109_제인에어1-300x511.jpg",110:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/110_제인에어2-300x511.jpg",111:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/111_크눌프-300x511.jpg",112:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/시계태엽오렌지-띠지-표11-300x511.jpg",113:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/113_파리의노트르담1-300x511.jpg",114:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/114_파리의노트르담-300x511.jpg",115:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/115_새로운인생-300x511.jpg",116:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/116_로드짐1-300x511.jpg",117:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/117_로드짐2-300x511.jpg",118:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/118_폭풍의언덕-300x511.jpg",119:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/119_텔크테에서의만남-300x511.jpg",120:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/120_검찰관-300x511.jpg",121:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/121_안개-300x511.jpg",122:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/122_나사의-회전-300x511.jpg",123:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/123_피츠제럴드-단편선-1-300x511.jpg",124:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/124_목화밭의-고독-속에서-300x511.jpg",125:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/125_돼지꿈-300x511.jpg",126:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/126_라셀라스-300x511.jpg",127:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/127_리어왕-300x511.jpg",128:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/128_쿠오-바디스-1-300x511.jpg",129:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/129_쿠오-바디스-2-300x511.jpg",130:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/130-자기만의방_표1-1-300x512.jpg",131:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/131_시르트의-바닷가-300x511.jpg",132:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/132_이성과-감성-300x511.jpg",133:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/133_바덴바덴에서의-여름-300x511.jpg",134:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/134_새로운-인생-300x511.jpg",135:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/135_무지개-1-300x511.jpg",136:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/136_무지개-2-300x511.jpg",137:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/137_인생의-베일-300x511.jpg",138:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/138_보이지-않는-도시들-300x511.jpg",139:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/139_연초-도매상-1-300x511.jpg",140:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/140_연초-도매상-2-300x511.jpg",141:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/141_연초-도매상-3-300x511.jpg",142:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/142_플로스-강의-물방앗간-1-300x511.jpg",143:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/143_플로스-강의-물방앗간-2-300x511.jpg",144:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/144_연인-300x511.jpg",145:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/145_이름없는-주드-1-300x511.jpg",146:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/146_이름없는-주드-2-300x511.jpg",147:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/147_제49호-품목의-경매-300x511.jpg",148:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/148_성역-300x511.jpg",149:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/149_무진기행-300x511.jpg",150:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/150_신곡-지옥편-300x511.jpg",152:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/152_신곡-천국편-300x511.jpg",153:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/153_구덩이-300x511.jpg",154:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/카라마조프가의형제들1_표1-300x498.jpg",155:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/카라마조프-가의-형제들-2_표1-300x498.jpg",156:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/카라마조프-가의-형제들-3_표1-300x516.jpg",157:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/157_지상의-양식-300x511.jpg",158:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/158_밤의-군대들-300x511.jpg",159:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/159_주홍-글자-300x511.jpg",160:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/160_깊은-강-300x511.jpg",161:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/161_욕망이라는-이름의-전차-300x511.jpg",162:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/162_마사-퀘스트-300x511.jpg",163:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/163_운명의-딸-1-300x511.jpg",164:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/164_운명의-딸-2-300x511.jpg",165:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/165_모렐의-발명-300x511.jpg",167:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/167_풀잎은-노래한다-300x511.jpg",168:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/168_파리의-우울-300x511.jpg",169:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/169_포스트맨은-벨을-두-번-울린다-300x511.jpg",170:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/170_썩은잎_표1-1-300x512.jpg",171:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/171_모든-것이-산산이-부서지다-300x511.jpg",172:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/172_한여름-밤의-꿈-300x511.jpg",173:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/173_로미오와-줄리엣-300x511.jpg",174:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/1.0-분노의-포도-1_표지_33쇄-300x511.jpg",175:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/1.0-분노의-포도-2_표지_31쇄-300x511.jpg",176:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/176_괴테와의-대화-1-300x511.jpg",177:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/177_괴테와의-대화-2-300x511.jpg",178:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/178_그물을-헤치고-300x511.jpg",179:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/179-브람스를-좋아하세요_표1-1-300x515.jpg",180:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/180_카타리나-블룸의-잃어버린-명예-300x511.jpg",181:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/181_에덴의-동쪽-1-300x511.jpg",182:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/182_에덴의-동쪽-2-300x511.jpg",183:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/183_순수의-시대-300x511.jpg",184:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/184_도둑-일기-300x511.jpg",185:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/185_나자-300x511.jpg",186:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/캐치1_표1+띠지-300x509.jpg",187:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/캐치2_표1+띠지-300x509.jpg",188:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/188_숄로호프-단편선-300x511.jpg",189:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/189_말-300x511.jpg",190:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/190_보이지-않는-인간-1-300x511.jpg",191:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/191_보이지-않는-인간-2-300x511.jpg",192:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/192_왑샷-가문-연대기-300x511.jpg",193:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/193_왑샷-가문-몰락기-300x511.jpg",194:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/194_필립과-다른-사람들-300x511.jpg",195:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/195_하두리아누스-황제의-회상록-1-300x511.jpg",196:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/196_하두리아누스-황제의-회상록-2-300x511.jpg",197:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/197_소피의-선택-1-300x511.jpg",198:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/198_소피의-선택-2-300x511.jpg",199:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/199_피츠제럴드-단편선-2-300x511.jpg",200:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/200_홍길동전-300x511.jpg",201:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/201_요술-부지깽이-300x511.jpg",202:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/202_북호텔-300x511.jpg",203:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/203_톰-소여의-모험-300x511.jpg",204:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/204_금오신화-300x511.jpg",205:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/205_테스-1-300x511.jpg",206:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/206_테스-2-300x511.jpg",207:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/207_부르스터플레이스의-여자들-300x511.jpg",208:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/208_더이상-평안은-없다-300x511.jpg",209:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/209_그레인지-코플랜드의-세-번째-인생-300x511.jpg",210:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/210_어느-시골-신부의-일기-300x511.jpg",211:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/211_타라스-불바-300x511.jpg",212:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/212_위대한-유산-1-300x511.jpg",213:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/213_위대한-유산-2-300x511.jpg",214:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/214_면도날-300x511.jpg",215:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/215_성채-1-300x511.jpg",216:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/216_성채-2-300x511.jpg",217:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/217_오이디푸스-왕-300x511.jpg",218:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/218_세일즈맨의-죽음-300x511.jpg",219:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/219_안나-카레리나-1-300x511.jpg",220:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/220_안나-카레리나-2-300x511.jpg",221:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/221_안나-카레리나-3-300x511.jpg",222:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/222_오스카-와일드-작품선-300x511.jpg",223:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/223_벨아미-300x511.jpg",224:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/224_파스쿠알-두아르테-가족-300x511.jpg",225:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/225_시칠리아에서의-대화-300x511.jpg",226:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/226_길-위에서-1-300x511.jpg",227:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/227_길-위에서-2-300x511.jpg",228:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/228_우리-시대의-영웅-300x511.jpg",229:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/229_아우라-300x511.jpg",230:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/230_클링조어의-마지막-여름-300x511.jpg",231:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/231_리스본의-겨울-300x511.jpg",232:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/232_뻐꾸기-둥지-위로-날아간-새-300x511.jpg",233:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/233_패널티킥-앞에-선-골키퍼의-불안-300x511.jpg",234:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/234_참을-수-없는-존재의-가벼움-300x511.jpg",235:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/235_바다여-바다여-1-300x511.jpg",236:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/236_바다여-바다여-2-300x511.jpg",237:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/237_한-줌의-먼지-300x511.jpg",238:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/238_뜨거운-양철-지붕-위의-고양이-유리-동물원-300x511.jpg",239:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/239_지하로부터의수기_표1-300x512.jpg",240:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/240_키메라-300x511.jpg",241:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/241_반쪼가리-자작-300x511.jpg",242:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/242_벌집-300x511.jpg",243:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/243_불멸-300x511.jpg",244:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/244_파우스트-박사-1-300x511.jpg",245:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/245_파우스트-박사-2-300x511.jpg",246:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/246_사랑할-때와-죽을-때-300x511.jpg",247:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/247_누가-버지니아-울프를-두려워하랴-300x511.jpg",248:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/248_인형의-집-300x511.jpg",249:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/249_위폐범들-300x511.jpg",250:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/250_무정-300x511.jpg",251:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/251_의지와-운명-1-300x511.jpg",252:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/252_의지와-운명-2-300x511.jpg",253:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/253_폭력적인-삶-300x511.jpg",254:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/254_거장과-마르가리타-300x511.jpg",255:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/255_경이로운-도시-1-300x511.jpg",256:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/256_경이로운-도시-2-300x511.jpg",257:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/257_야콥을-둘러싼-추측들-300x511.jpg",258:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/258_왕자와-거지-300x511.jpg",259:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/259_존재하지-않는-기사-300x511.jpg",260:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/260_눈먼-암살자-1-300x511.jpg",261:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/261_눈먼-암살자-2-300x511.jpg",262:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/262_베니스의-상인-300x511.jpg",263:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/263_말리나-300x511.jpg",264:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/264_사볼타-사건의-진실-300x511.jpg",265:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/265_뒤렌마트-희곡선-300x511.jpg",266:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/266_이방인-300x511.jpg",267:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/267_페스트-300x511.jpg",268:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/268_검은-튤립-300x511.jpg",269:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/269_베를린-알렉산더-광장-1-300x511.jpg",270:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/270_베를린-알렉산더-광장-2-300x511.jpg",271:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/271_하얀성-300x511.jpg",272:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/272_푸슈킨-선집-300x511.jpg",273:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/273_유리알-유희-1-300x511.jpg",274:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/274_유리알-유희-2-300x511.jpg",275:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/275_픽션들-300x511.jpg",276:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/276_신의-화살-300x511.jpg",277:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/277_빌헬름-텔-간계와-사랑-300x511.jpg",278:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/278_노인과-바다-300x511.jpg",279:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/279_무기여-잘-있어라-300x511.jpg",280:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/280_태양은-다시-떠오른다-300x511.jpg",281:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/281_알레프-300x511.jpg",282:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/282_일곱-박공의-집-300x511.jpg",283:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/283_에마-300x511.jpg",284:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/284-죄와벌1_표1-300x510.jpg",285:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/285-죄와벌2_표1-300x510.jpg",286:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/286_시련-300x511.jpg",287:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/287_모두가-나의-아들-300x511.jpg",288:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/288_누구를-위하여-종을-울리나-1-300x511.jpg",289:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/289_누구를-위하여-종을-울리나-2-300x511.jpg",290:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/290_구르브-연락-없다-300x511.jpg",291:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/291_데카메론-1-300x511.jpg",292:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/데카메론2-표1-300x509.jpg",293:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/데카메론3-표1-300x517.jpg",294:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/294_나누어진-하늘-300x511.jpg",295:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/295_제브데트-씨와-아들들-1-300x511.jpg",296:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/296_제브데트-씨와-아들들-2-300x511.jpg",297:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/297_여인의-초상-1-300x511.jpg",298:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/298_여인의-초상-2-300x511.jpg",299:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/299_압살롬-압살롬-300x511.jpg",300:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/300_이상-소설-전집-300x511.jpg",301:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/301_레-미제라블-1-300x511.jpg",302:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/302_레-미제라블-2-300x511.jpg",303:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/303_레-미제라블-3-300x511.jpg",304:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/304_레-미제라블-4-300x511.jpg",305:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/305레-미제라블-5-300x511.jpg",306:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/306_관객모독-300x511.jpg",307:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/307_더블린-사람들-300x511.jpg",308:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/308_애드거-앨런-포-단편선-300x511.jpg",309:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/309_보이체크-당통의-죽음-300x511.jpg",310:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/310_노르웨이의-숲_표1-300x511.jpg",311:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/311_운명론자-자크와-그의-주인_표11-300x508.jpg",312:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/헤밍웨이-단편선-1_표1-300x512.jpg",313:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/헤밍웨이-단편선-2_표1-300x511.jpg",314:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/피라미드_표지1-300x511.jpg",315:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/닫힌-방-악마와-선한-신_표1-300x513.jpg",316:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/등대로-표지-11-300x497.jpg",317:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/한국희곡선1_표11-300x511.jpg",318:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/한국희곡선2_표1-300x512.jpg",319:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/319_여자의-일생_표1_s-300x510.jpg",320:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/320_의식_표1-300x511.jpg",321:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/321_육체의악마_표1_72dpi-300x511.jpg",322:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/감정교육-띠지-표1-300x511.jpg",323:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/감정교육-띠지-표12-300x511.jpg",324:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/324_불타는-평원_표11-300x512.jpg",325:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/325_위대한몬느_표1_웹-300x511.jpg",326:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집326_라쇼몬-표1-300x499.jpg",327:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/반바지당나귀_web-300x511.jpg",328:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/정복자들_표1+띠지-300x511.jpg",329:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_329_우리동네아이들1-300x512.jpg",330:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_330_우리동네아이들2-300x511.jpg",331:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/개선문1_표1-300x511.jpg",332:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/개선문2_표1-300x511.jpg",333:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/333_사바나의개미언덕_표12-300x508.jpg",334:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집-334_게걸음으로_표1_웹사이즈-300x511.jpg",335:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집335_코스모스_표1-300x511.jpg",336:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/좁은문외_표1_웹용-300x511.jpg",337:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/337_암병동1_표1-300x510.jpg",338:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/338_암병동2_표1-300x512.jpg",339:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_339_피의-꽃잎들-300x511.jpg",340:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/340_운명-표1-300x511.jpg",341:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/벌거벗은자와죽은자1_표1-300x510.jpg",342:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/벌거벗은자와죽은자2_표1-300x510.jpg",343:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/시지프-신화_표1이미지-300x511.jpg",344:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/344_뇌우_표11-300x509.jpg",345:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/345_모옌-중단편선_표1-300x510.jpg",346:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/일야서-표11-300x499.jpg",347:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_상속자들최종-300x511.jpg",348:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집348_설득_표1-300x510.jpg",349:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집349_히로시마내사랑_표지-300x512.jpg",350:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/350_오헨리_표1교체-300x510.jpg",351:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/올리버-트위스트_1권-표지-300x511.jpg",352:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/올리버-트위스트_2권-표지-300x511.jpg",353:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/표지_전쟁과평화1-300x511.jpg",354:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/표지_전쟁과평화2-300x511.jpg",355:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/표지_전쟁과평화3-300x511.jpg",356:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/표지_전쟁과평화4-300x511.jpg",357:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/357_다시찾은브라이즈헤드_표1-300x510.jpg",359:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/359_사양_표1-300x510.jpg",360:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/360_좌절_표1-300x510.jpg",362:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/닥터-지바고-2_표1jpg-300x511.jpg",363:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_363_노생거사원_표1-300x511.jpg",364:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/개구리_표1-300x510.jpg",365:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_마왕_표1-300x511.jpg",366:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_366_맨스필드-파크_표11-300x511.jpg",367:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/367_이선프롬_표1-300x511.jpg",368:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/368_여름_표1-300x511.jpg",369:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/369_나는-고백한다1_표11-300x511.jpg",370:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/370_나는-고백한다2_표1-300x511.jpg",371:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/371_나는-고백한다3_표1-300x511.jpg",372:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전372_태엽감는새연대기1권-표1-300x510.jpg",373:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전373_태엽감는새연대기2권-표1-300x509.jpg",374:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전374_태엽감는새연대기3권-표1-300x512.jpg",375:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/대사들_1_표1-300x505.jpg",376:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/대사들_2_표1-300x508.jpg",377:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_377_족장의-가을_표1-300x511.jpg",379:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/모두다예쁜말들_표1-1-300x511.jpg",380:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/국경을넘어_표1-300x510.jpg",381:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/평원의도시들_표1-300x510.jpg",382:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전만년_표1+띠지-1-300x507.jpg",383:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전반항하는인간_표11-300x508.jpg",384:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/384-386_악령1_표지펼침41-300x511.jpg",385:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/384-386_악령1_표지펼침42-300x511.jpg",386:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/384-386_악령1_표지펼침43-300x511.jpg",387:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/태평양을-막는-제방_표1_띠지-300x511.jpg",388:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/388_남아-있는-나날_표12-300x512.jpg",389:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/앙리-브륄라르의-생애_표1-300x511.jpg",390:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/표15-300x505.jpg",391:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/표17-300x511.jpg",392:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/392_서머싯몸단편선_1_표1-300x511.jpg",393:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/393_서머싯몸단편선_2_표1-300x509.jpg",394:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/394_케이크와맥주_표1-1-300x510.jpg",395:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_395_월든_띠지-300x510.jpg",396:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_모래사나이_표1-300x489.jpg",397:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/검은책1표1-300x511.jpg",398:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/검은책2표1-300x511.jpg",399:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/방랑자들_표1+띠지-300x508.jpg",400:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/시여침을뱉어라_표1-300x511.jpg",401:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/401_환락의집1_표11-300x511.jpg",402:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/402_환락의집2_표1-300x511.jpg",403:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/달려라메로스_표1-300x510.jpg",404:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/아버지와자식_표1-300x508.jpg",405:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/청부살인자의성모_표1_띠지-300x511.jpg",406:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세피아빛초상_표1-300x511.jpg",407:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/407_사기열전_표지1-300x511.jpg",408:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/408_사기열전_표지1-300x511.jpg",409:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/409_사기열전_표지1-300x511.jpg",410:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/410_사기열전_표지1-300x511.jpg",411:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/이상시전집표1-300x510.jpg",412:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전412어둠속의사건_표1-1-300x511.jpg",413:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_태평천하_표1-300x511.jpg",414:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/414-415_노스트로모1_표1-300x511.jpg",415:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/414-415_노스트로모2_표1-300x511.jpg",416:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/416_제르미날1_표1-1-300x511.jpg",417:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/417_제르미날2_표1-300x511.jpg",418:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/418_명인_표1-300x509.jpg",419:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/419핀처마틴_표1-300x511.jpg",420:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전420사라진_샤베르대령_표1-300x511.jpg",421:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_빅서_입체북-300x431.jpg",422:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/코뿔소_표1-300x511.jpg",423:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/423_블랙박스_표1-300x513.jpg",424:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/424고양이눈1_표1-300x511.jpg",425:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/425고양이눈2_표1-300x511.jpg",426:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/426도둑신부1_표1-300x511.jpg",427:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/427도둑신부2_표1-300x511.jpg",428:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_슈니츨러_표1-300x511.jpg",429:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전세계의끝과화드보일드원더랜드1_표1-300x511.jpg",430:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전세계의끝과화드보일드원더랜드2_표1-300x511.jpg",431:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전멜랑콜리아-띠지_표1-300x512.jpg",432:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/민음사_도적들_표1-300x511.jpg",433:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/433_예브게니오네긴_대위의딸_표1-300x511.jpg",434:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/434-초대받은-여자1-표1-300x511.jpg",435:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/435-초대받은-여자2-표1-300x511.jpg",436:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_436_미들마치_표1-300x511.jpg",437:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_437_미들마치2_표1-300x511.jpg",438:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/438_이반일리치의죽음_표1-300x511.jpg",439:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/439-캔터베리-이야기-표1-300x511.jpg",440:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/440-캔터베리-이야기-표1-300x511.jpg",441:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/441_아소무아르_표1-300x511.jpg",442:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/442_아소무아르_표1-300x511.jpg",443:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_443_가난한사람들_표1-300x511.jpg",444:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/444-마차오-사전-1--300x521.jpg",445:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/445-마차오-사전-2-300x525.jpg",446:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/집으로날아가다_표1-300x511.jpg",447:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/집으로부터-멀리_표1-300x511.jpg",448:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/448_바스커빌가의-사냥개_표1-300x511.jpg",450:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/450-필경사-바틀비_표1-300x511.jpg",451:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전451_8월은악마의달_표1-300x511.jpg",452:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/452-헌등사_표지4-300x511.jpg",453:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/색계_표1-300x511.jpg",454:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_454_겨울여행_표1-300x511.jpg",455:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_455_기억의빛-표1-300x511.jpg",456:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/452_표범_표지띠지4-3-300x511.jpg",457:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전457_크리스마스캐럴_표1-300x511.jpg",458:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/458_버진수어사이드_표1-300x511.jpg",459:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/459-460_미들섹스1_표1-300x511.jpg",460:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/459-460_미들섹스2_표1-300x511.jpg",461:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_461_사랑에대하여_표1-300x511.jpg",462:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/462_나_표1띠지-300x511.jpg",463:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/463-지킬-박사와-하이드_표1-300x511.jpg",464:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전464_박지원-소설선_표1-300x511.jpg",465:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_465_안과-겉‧결혼‧여름_표1-300x511.jpg",466:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전466_소중한저주_표1-300x511.jpg",467:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전_467_향성_표1-300x511.jpg",468:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세문전468_퀴어_표4-300x511.jpg",469:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/악수도없이헤어졌다_표1-300x511.jpg",472:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/사람은-무엇으로-사는가_표1-300x511.jpg",473:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/도련님_표1-300x511.jpg",476:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/476_레볼루셔너리-로드_표1-300x511.jpg",484:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/484_댈러웨이부인_표1-300x511.jpg",51:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_51_내이름은빨강_01_표1-300x510.jpg",52:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/세계문학전집_52_내이름은빨강_02_표1-500x851.jpg",55:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/055_모래의-여자-500x841.jpg",58:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/058_싯타르타_표지-500x842.jpg",66:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/066_나르치스와골드문트-500x852.jpg",95:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/095_적과흑1-500x852.jpg",151:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/151_신곡-연옥편-500x852.jpg",166:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/삼국유사_표1-500x735.jpg",358:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/358_아무도-대령에게-편지하지-않다_표11-500x852.jpg",361:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/닥터-지바고-1_표1-500x852.jpg",378:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/핏빛자오선_표1-500x851.jpg",449:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/449_사냥꾼의스케치_표1-500x852.jpg",470:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/470-버지니아울프단편선_표1-500x852.jpg",471:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/쓰가루_표1-500x852.jpg",474:"https://minumsa.minumsa.com/wp-content/uploads/bookcover/표1_명심보감-500x737.jpg",475:"https://contents.kyobobook.co.kr/sih/fit-in/200x0/pdt/9788937464751.jpg"};
+// Helper to get cover URL: COVERS first, then cat.c fallback
+function getCover(vol) { return COVERS[vol] || (CATALOG[vol] && CATALOG[vol].c) || ''; }
+
+// ============================================================
+// DATA
+// ============================================================
+const CATALOG = {
+1:{t:'변신 이야기 1',a:'오비디우스',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/001_변신-이야기11-300x507.jpg'},
+2:{t:'변신 이야기 2',a:'오비디우스',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/002_변신-이야기21-300x508.jpg'},
+3:{t:'햄릿',a:'윌리엄 셰익스피어',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/003_햄릿-300x507.jpg'},
+4:{t:'변신·시골의사',a:'프란츠 카프카',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/004_변신-시골의사-300x506.jpg'},
+5:{t:'동물농장',a:'조지 오웰',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/005_동물농장-300x508.jpg'},
+6:{t:'허클베리 핀의 모험',a:'마크 트웨인',c:''},7:{t:'암흑의 핵심',a:'조지프 콘래드',c:''},
+8:{t:'토니오 크뢰거',a:'토마스 만',c:''},9:{t:'문학이란 무엇인가',a:'장폴 사르트르',c:''},
+10:{t:'한국단편문학선 1',a:'김동인',c:''},11:{t:'인간의 굴레에서 1',a:'서머싯 몸',c:''},
+12:{t:'인간의 굴레에서 2',a:'서머싯 몸',c:''},
+13:{t:'이반 데니소비치, 수용소의 하루',a:'알렉산드르 솔제니친',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/013_이반-데니소비치-300x505.jpg'},
+14:{t:'너새니얼 호손 단편선',a:'너새니얼 호손',c:''},15:{t:'나의 미카엘',a:'아모스 오즈',c:''},
+16:{t:'중국신화전설 1',a:'위앤커',c:''},17:{t:'중국신화전설 2',a:'위앤커',c:''},
+18:{t:'고리오 영감',a:'오노레 드 발자크',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/018_고리오-영감-300x505.jpg'},
+19:{t:'파리대왕',a:'윌리엄 골딩',c:''},
+20:{t:'한국단편문학선 2',a:'김동리',c:''},21:{t:'파우스트 1',a:'괴테',c:''},22:{t:'파우스트 2',a:'괴테',c:''},
+23:{t:'빌헬름 마이스터의 수업시대 1',a:'괴테',c:''},24:{t:'빌헬름 마이스터의 수업시대 2',a:'괴테',c:''},
+25:{t:'젊은 베르테르의 슬픔',a:'괴테',c:''},26:{t:'이피게니에·스텔라',a:'괴테',c:''},
+27:{t:'다섯째 아이',a:'도리스 레싱',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/027_다섯째-아이-300x506.jpg'},
+28:{t:'삶의 한가운데',a:'루이제 린저',c:''},29:{t:'농담',a:'밀란 쿤데라',c:''},
+30:{t:'야성의 부름',a:'잭 런던',c:''},31:{t:'아메리칸',a:'헨리 제임스',c:''},
+32:{t:'양철북 1',a:'귄터 그라스',c:''},33:{t:'양철북 2',a:'귄터 그라스',c:''},
+34:{t:'백년의 고독 1',a:'마르케스',c:''},35:{t:'백년의 고독 2',a:'마르케스',c:''},
+36:{t:'마담 보바리',a:'플로베르',c:''},37:{t:'거미여인의 키스',a:'마누엘 푸익',c:''},
+38:{t:'달과 6펜스',a:'서머싯 몸',c:''},39:{t:'폴란드의 풍차',a:'장 지오노',c:''},
+40:{t:'독일어 시간 1',a:'지그프리트 렌츠',c:''},41:{t:'독일어 시간 2',a:'지그프리트 렌츠',c:''},
+42:{t:'말테의 수기',a:'릴케',c:''},43:{t:'고도를 기다리며',a:'사뮈엘 베케트',c:''},
+44:{t:'데미안',a:'헤르만 헤세',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/044_데미안-300x504.jpg'},
+45:{t:'젊은 예술가의 초상',a:'제임스 조이스',c:''},46:{t:'카탈로니아 찬가',a:'조지 오웰',c:''},
+47:{t:'호밀밭의 파수꾼',a:'J.D. 샐린저',c:''},
+48:{t:'파르마의 수도원 1',a:'스탕달',c:''},49:{t:'파르마의 수도원 2',a:'스탕달',c:''},
+50:{t:'수레바퀴 아래서',a:'헤르만 헤세',c:''},
+51:{t:'내 이름은 빨강 1',a:'오르한 파묵',c:''},52:{t:'내 이름은 빨강 2',a:'오르한 파묵',c:''},
+53:{t:'오셀로',a:'셰익스피어',c:''},54:{t:'조서',a:'르 클레지오',c:''},
+55:{t:'모래의 여자',a:'아베 코보',c:''},
+56:{t:'부덴브로크 가의 사람들 1',a:'토마스 만',c:''},57:{t:'부덴브로크 가의 사람들 2',a:'토마스 만',c:''},
+58:{t:'싯다르타',a:'헤르만 헤세',c:''},
+59:{t:'아들과 연인 1',a:'D.H. 로렌스',c:''},60:{t:'아들과 연인 2',a:'D.H. 로렌스',c:''},
+61:{t:'설국',a:'가와바타 야스나리',c:''},62:{t:'벨킨 이야기',a:'푸슈킨',c:''},
+63:{t:'넙치 1',a:'귄터 그라스',c:''},64:{t:'넙치 2',a:'귄터 그라스',c:''},
+65:{t:'소망 없는 불행',a:'페터 한트케',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/065_소망없는불행-300x511.jpg'},
+66:{t:'나르치스와 골드문트',a:'헤르만 헤세',c:''},67:{t:'황야의 이리',a:'헤르만 헤세',c:''},
+68:{t:'페테르부르크 이야기',a:'니콜라이 고골',c:''},69:{t:'밤으로의 긴 여로',a:'유진 오닐',c:''},
+70:{t:'체호프 단편선',a:'안톤 체호프',c:''},71:{t:'버스 정류장',a:'가오싱젠',c:''},
+72:{t:'구운몽',a:'김만중',c:''},73:{t:'대머리 여가수',a:'이오네스코',c:''},
+74:{t:'이솝 우화집',a:'이솝',c:''},
+75:{t:'위대한 개츠비',a:'F. 스콧 피츠제럴드',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/075_위대한개츠비-300x511.jpg'},
+76:{t:'푸른 꽃',a:'노발리스',c:''},
+77:{t:'1984',a:'조지 오웰',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/077_1984-300x511.jpg'},
+78:{t:'영혼의 집 1',a:'이사벨 아옌데',c:''},79:{t:'영혼의 집 2',a:'이사벨 아옌데',c:''},
+80:{t:'첫사랑',a:'투르게네프',c:''},81:{t:'내가 죽어 누워 있을 때',a:'포크너',c:''},
+82:{t:'런던 스케치',a:'도리스 레싱',c:''},83:{t:'팡세',a:'파스칼',c:''},
+84:{t:'질투',a:'로브그리예',c:''},85:{t:'채털리 부인의 연인 1',a:'D.H. 로렌스',c:''},
+86:{t:'채털리 부인의 연인 2',a:'D.H. 로렌스',c:''},87:{t:'그 후',a:'나쓰메 소세키',c:''},
+88:{t:'오만과 편견',a:'제인 오스틴',c:''},
+89:{t:'부활 1',a:'톨스토이',c:''},90:{t:'부활 2',a:'톨스토이',c:''},
+91:{t:'방드르디',a:'미셸 투르니에',c:''},92:{t:'미겔 스트리트',a:'V.S. 나이폴',c:''},
+93:{t:'페드로 파라모',a:'후안 룰포',c:''},94:{t:'차라투스트라는 이렇게 말했다',a:'니체',c:''},
+95:{t:'적과 흑',a:'스탕달',c:''},96:{t:'적과 흑 2',a:'스탕달',c:''},
+97:{t:'콜레라 시대의 사랑 1',a:'마르케스',c:''},98:{t:'콜레라 시대의 사랑 2',a:'마르케스',c:''},
+99:{t:'맥베스',a:'셰익스피어',c:''},100:{t:'춘향전',a:'작자미상',c:''},
+101:{t:'페르디두르케',a:'곰브로비치',c:''},102:{t:'포르노그라피아',a:'곰브로비치',c:''},
+103:{t:'인간 실격',a:'다자이 오사무',c:''},
+104:{t:'네루다의 우편배달부',a:'안토니오 스카르메타',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/104_네루다의우편배달부-300x511.jpg'},
+105:{t:'이탈리아 기행 1',a:'괴테',c:''},106:{t:'이탈리아 기행 2',a:'괴테',c:''},
+107:{t:'나무 위의 남작',a:'칼비노',c:''},108:{t:'달콤 쌉싸름한 초콜릿',a:'라우라 에스키벨',c:''},
+109:{t:'제인 에어 1',a:'샬럿 브론테',c:''},110:{t:'제인 에어 2',a:'샬럿 브론테',c:''},
+111:{t:'크눌프',a:'헤르만 헤세',c:''},
+112:{t:'시계태엽 오렌지',a:'앤서니 버지스',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/시계태엽오렌지-띠지-표11-300x511.jpg'},
+113:{t:'파리의 노트르담 1',a:'빅토르 위고',c:''},114:{t:'파리의 노트르담 2',a:'빅토르 위고',c:''},
+115:{t:'새로운 인생',a:'단테',c:''},116:{t:'로드 짐 1',a:'콘래드',c:''},117:{t:'로드 짐 2',a:'콘래드',c:''},
+118:{t:'폭풍의 언덕',a:'에밀리 브론테',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/118_폭풍의언덕-300x511.jpg'},
+119:{t:'텔크테에서의 만남',a:'귄터 그라스',c:''},120:{t:'검찰관',a:'고골',c:''},
+121:{t:'안개',a:'우나무노',c:''},122:{t:'나사의 회전',a:'헨리 제임스',c:''},
+123:{t:'피츠제럴드 단편선 1',a:'피츠제럴드',c:''},124:{t:'목화밭의 고독 속에서',a:'콜테스',c:''},
+125:{t:'돼지꿈',a:'황석영',c:''},126:{t:'라셀라스',a:'새뮤얼 존슨',c:''},
+127:{t:'리어 왕',a:'셰익스피어',c:''},128:{t:'쿠오 바디스 1',a:'시엔키에비츠',c:''},
+129:{t:'쿠오 바디스 2',a:'시엔키에비츠',c:''},
+130:{t:'자기만의 방',a:'버지니아 울프',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/130-자기만의방_표1-1-300x512.jpg'},
+131:{t:'시르트의 바닷가',a:'쥘리앙 그라크',c:''},132:{t:'이성과 감성',a:'제인 오스틴',c:''},
+133:{t:'바덴바덴에서의 여름',a:'레오니드 치프킨',c:''},134:{t:'새로운 인생',a:'오르한 파묵',c:''},
+135:{t:'무지개 1',a:'D.H. 로렌스',c:''},136:{t:'무지개 2',a:'D.H. 로렌스',c:''},
+137:{t:'인생의 베일',a:'서머싯 몸',c:''},138:{t:'보이지 않는 도시들',a:'칼비노',c:''},
+139:{t:'연초 도매상 1',a:'존 바스',c:''},140:{t:'연초 도매상 2',a:'존 바스',c:''},
+141:{t:'연초 도매상 3',a:'존 바스',c:''},142:{t:'플로스 강의 물방앗간 1',a:'조지 엘리엇',c:''},
+143:{t:'플로스 강의 물방앗간 2',a:'조지 엘리엇',c:''},144:{t:'연인',a:'뒤라스',c:''},
+145:{t:'이름 없는 주드 1',a:'토머스 하디',c:''},146:{t:'이름 없는 주드 2',a:'토머스 하디',c:''},
+147:{t:'제49호 품목의 경매',a:'토머스 핀천',c:''},148:{t:'성역',a:'포크너',c:''},
+149:{t:'무진기행',a:'김승옥',c:''},150:{t:'신곡 지옥편',a:'단테',c:''},
+151:{t:'신곡 연옥편',a:'단테',c:''},152:{t:'신곡 천국편',a:'단테',c:''},
+153:{t:'구덩이',a:'안드레이 플라토노프',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/153_구덩이-300x511.jpg'},
+154:{t:'카라마조프 가의 형제들',a:'도스토예프스키',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/카라마조프가의형제들1_표1-300x498.jpg'},
+155:{t:'카라마조프 가의 형제들 2',a:'도스토예프스키',c:''},156:{t:'카라마조프 가의 형제들 3',a:'도스토예프스키',c:''},
+157:{t:'지상의 양식',a:'앙드레 지드',c:''},158:{t:'밤의 군대들',a:'노먼 메일러',c:''},
+159:{t:'주홍 글자',a:'너새니얼 호손',c:''},160:{t:'깊은 강',a:'엔도 슈사쿠',c:''},
+161:{t:'욕망이라는 이름의 전차',a:'테네시 윌리엄스',c:''},162:{t:'마사 퀘스트',a:'도리스 레싱',c:''},
+163:{t:'운명의 딸 1',a:'이사벨 아옌데',c:''},164:{t:'운명의 딸 2',a:'이사벨 아옌데',c:''},
+165:{t:'모렐의 발명',a:'카사레스',c:''},166:{t:'삼국유사',a:'일연',c:''},
+167:{t:'풀잎은 노래한다',a:'도리스 레싱',c:''},168:{t:'파리의 우울',a:'보들레르',c:''},
+169:{t:'포스트맨은 벨을 두 번 울린다',a:'제임스 M. 케인',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/169_포스트맨은-벨을-두-번-울린다-300x511.jpg'},
+170:{t:'썩은 잎',a:'마르케스',c:''},171:{t:'모든 것이 산산이 부서지다',a:'치누아 아체베',c:''},
+172:{t:'한여름 밤의 꿈',a:'셰익스피어',c:''},173:{t:'로미오와 줄리엣',a:'셰익스피어',c:''},
+174:{t:'분노의 포도 1',a:'존 스타인벡',c:''},175:{t:'분노의 포도 2',a:'존 스타인벡',c:''},
+176:{t:'괴테와의 대화 1',a:'에커만',c:''},177:{t:'괴테와의 대화 2',a:'에커만',c:''},
+178:{t:'그물을 헤치고',a:'아이리스 머독',c:''},179:{t:'브람스를 좋아하세요...',a:'프랑수아즈 사강',c:''},
+180:{t:'카타리나 블룸의 잃어버린 명예',a:'하인리히 뵐',c:''},
+181:{t:'에덴의 동쪽 1',a:'존 스타인벡',c:''},182:{t:'에덴의 동쪽 2',a:'존 스타인벡',c:''},
+183:{t:'순수의 시대',a:'이디스 워튼',c:''},184:{t:'도둑 일기',a:'장 주네',c:''},
+185:{t:'나자',a:'앙드레 브르통',c:''},186:{t:'캐치-22 1',a:'조지프 헬러',c:''},
+187:{t:'캐치-22 2',a:'조지프 헬러',c:''},188:{t:'숄로호프 단편선',a:'숄로호프',c:''},
+189:{t:'말',a:'사르트르',c:''},190:{t:'보이지 않는 인간 1',a:'랠프 엘리슨',c:''},
+191:{t:'보이지 않는 인간 2',a:'랠프 엘리슨',c:''},192:{t:'왑샷 가문 연대기',a:'존 치버',c:''},
+193:{t:'왑샷 가문 몰락기',a:'존 치버',c:''},194:{t:'필립과 다른 사람들',a:'세스 노터봄',c:''},
+195:{t:'하드리아누스 황제의 회상록 1',a:'유르스나르',c:''},196:{t:'하드리아누스 황제의 회상록 2',a:'유르스나르',c:''},
+197:{t:'소피의 선택 1',a:'윌리엄 스타이런',c:''},198:{t:'소피의 선택 2',a:'윌리엄 스타이런',c:''},
+199:{t:'피츠제럴드 단편선 2',a:'피츠제럴드',c:''},200:{t:'홍길동전',a:'허균',c:''},
+201:{t:'요술 부지깽이',a:'로버트 쿠버',c:''},202:{t:'북호텔',a:'외젠 다비',c:''},
+203:{t:'톰 소여의 모험',a:'마크 트웨인',c:''},204:{t:'금오신화',a:'김시습',c:''},
+205:{t:'테스',a:'토머스 하디',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/205_테스-1-300x511.jpg'},
+206:{t:'테스 2',a:'토머스 하디',c:''},207:{t:'브루스터플레이스의 여자들',a:'글로리아 네일러',c:''},
+208:{t:'더 이상 평안은 없다',a:'치누아 아체베',c:''},209:{t:'그레인지 코플랜드의 세 번째 인생',a:'앨리스 워커',c:''},
+210:{t:'어느 시골 신부의 일기',a:'베르나노스',c:''},211:{t:'타라스 불바',a:'고골',c:''},
+212:{t:'위대한 유산 1',a:'찰스 디킨스',c:''},213:{t:'위대한 유산 2',a:'찰스 디킨스',c:''},
+214:{t:'면도날',a:'서머싯 몸',c:''},215:{t:'성채 1',a:'A.J. 크로닌',c:''},
+216:{t:'성채 2',a:'A.J. 크로닌',c:''},217:{t:'오이디푸스 왕',a:'소포클레스',c:''},
+218:{t:'세일즈맨의 죽음',a:'아서 밀러',c:''},219:{t:'안나 카레니나 1',a:'톨스토이',c:''},
+220:{t:'안나 카레니나 2',a:'톨스토이',c:''},221:{t:'안나 카레니나 3',a:'톨스토이',c:''},
+222:{t:'오스카 와일드 작품선',a:'오스카 와일드',c:''},223:{t:'벨아미',a:'기 드 모파상',c:''},
+224:{t:'파스쿠알 두아르테 가족',a:'카밀로 호세 셀라',c:''},225:{t:'시칠리아에서의 대화',a:'엘리오 비토리니',c:''},
+226:{t:'길 위에서 1',a:'잭 케루악',c:''},227:{t:'길 위에서 2',a:'잭 케루악',c:''},
+228:{t:'우리 시대의 영웅',a:'레르몬토프',c:''},229:{t:'아우라',a:'카를로스 푸엔테스',c:''},
+230:{t:'클링조어의 마지막 여름',a:'헤르만 헤세',c:''},231:{t:'리스본의 겨울',a:'무뇨스 몰리나',c:''},
+232:{t:'뻐꾸기 둥지 위로 날아간 새',a:'켄 키지',c:''},233:{t:'페널티킥 앞에 선 골키퍼의 불안',a:'페터 한트케',c:''},
+234:{t:'참을 수 없는 존재의 가벼움',a:'밀란 쿤데라',c:''},235:{t:'바다여, 바다여 1',a:'아이리스 머독',c:''},
+236:{t:'바다여, 바다여 2',a:'아이리스 머독',c:''},237:{t:'한 줌의 먼지',a:'에벌린 워',c:''},
+238:{t:'뜨거운 양철지붕 위의 고양이',a:'테네시 윌리엄스',c:''},
+239:{t:'지하로부터의 수기',a:'도스토예프스키',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/239_지하로부터의수기_표1-300x512.jpg'},
+240:{t:'키메라',a:'존 바스',c:''},241:{t:'반쪼가리 자작',a:'칼비노',c:''},
+242:{t:'벌집',a:'카밀로 호세 셀라',c:''},243:{t:'불멸',a:'밀란 쿤데라',c:''},
+244:{t:'파우스트 박사 1',a:'토마스 만',c:''},245:{t:'파우스트 박사 2',a:'토마스 만',c:''},
+246:{t:'사랑할 때와 죽을 때',a:'레마르크',c:''},247:{t:'누가 버지니아 울프를 두려워하랴',a:'에드워드 올비',c:''},
+248:{t:'인형의 집',a:'헨리크 입센',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/248_인형의-집-300x511.jpg'},
+249:{t:'위폐범들',a:'앙드레 지드',c:''},250:{t:'무정',a:'이광수',c:''},
+251:{t:'의지와 운명 1',a:'카를로스 푸엔테스',c:''},252:{t:'의지와 운명 2',a:'카를로스 푸엔테스',c:''},
+253:{t:'폭력적인 삶',a:'파솔리니',c:''},254:{t:'거장과 마르가리타',a:'불가코프',c:''},
+255:{t:'경이로운 도시 1',a:'에두아르도 멘도사',c:''},256:{t:'경이로운 도시 2',a:'에두아르도 멘도사',c:''},
+257:{t:'야콥을 둘러싼 추측들',a:'우베 욘존',c:''},258:{t:'왕자와 거지',a:'마크 트웨인',c:''},
+259:{t:'존재하지 않는 기사',a:'칼비노',c:''},260:{t:'눈먼 암살자 1',a:'마거릿 애트우드',c:''},
+261:{t:'눈먼 암살자 2',a:'마거릿 애트우드',c:''},262:{t:'베니스의 상인',a:'셰익스피어',c:''},
+263:{t:'말리나',a:'잉에보르크 바흐만',c:''},264:{t:'사볼타 사건의 진실',a:'에두아르도 멘도사',c:''},
+265:{t:'뒤렌마트 희곡선',a:'뒤렌마트',c:''},
+266:{t:'이방인',a:'알베르 카뮈',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/266_이방인-300x511.jpg'},
+267:{t:'페스트',a:'알베르 카뮈',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/267_페스트-300x511.jpg'},
+268:{t:'검은 튤립',a:'알렉상드르 뒤마',c:''},269:{t:'베를린 알렉산더 광장 1',a:'알프레트 되블린',c:''},
+270:{t:'베를린 알렉산더 광장 2',a:'알프레트 되블린',c:''},271:{t:'하얀 성',a:'오르한 파묵',c:''},
+272:{t:'푸슈킨 선집',a:'푸슈킨',c:''},
+273:{t:'유리알 유희 1',a:'헤르만 헤세',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/273_유리알-유희-1-300x511.jpg'},
+274:{t:'유리알 유희 2',a:'헤르만 헤세',c:''},275:{t:'픽션들',a:'보르헤스',c:''},
+276:{t:'신의 화살',a:'치누아 아체베',c:''},277:{t:'빌헬름 텔·간계와 사랑',a:'실러',c:''},
+278:{t:'노인과 바다',a:'어니스트 헤밍웨이',c:''},279:{t:'무기여 잘 있어라',a:'헤밍웨이',c:''},
+280:{t:'태양은 다시 떠오른다',a:'헤밍웨이',c:''},281:{t:'알레프',a:'보르헤스',c:''},
+282:{t:'일곱 박공의 집',a:'너새니얼 호손',c:''},
+283:{t:'엠마',a:'제인 오스틴',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/283_에마-300x511.jpg'},
+284:{t:'죄와 벌 1',a:'도스토예프스키',c:''},285:{t:'죄와 벌 2',a:'도스토예프스키',c:''},
+286:{t:'시련',a:'아서 밀러',c:''},287:{t:'모두가 나의 아들',a:'아서 밀러',c:''},
+288:{t:'누구를 위하여 종은 울리나 1',a:'헤밍웨이',c:''},289:{t:'누구를 위하여 종은 울리나 2',a:'헤밍웨이',c:''},
+290:{t:'구르브 연락 없다',a:'에두아르도 멘도사',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/290_구르브-연락-없다-300x511.jpg'},
+291:{t:'데카메론 1',a:'보카치오',c:''},292:{t:'데카메론 2',a:'보카치오',c:''},293:{t:'데카메론 3',a:'보카치오',c:''},
+294:{t:'나누어진 하늘',a:'크리스타 볼프',c:''},295:{t:'제브데트 씨와 아들들 1',a:'오르한 파묵',c:''},
+296:{t:'제브데트 씨와 아들들 2',a:'오르한 파묵',c:''},297:{t:'여인의 초상 1',a:'헨리 제임스',c:''},
+298:{t:'여인의 초상 2',a:'헨리 제임스',c:''},299:{t:'압살롬, 압살롬!',a:'포크너',c:''},
+300:{t:'이상 소설 전집',a:'이상',c:''},
+301:{t:'레 미제라블',a:'빅토르 위고',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/301_레-미제라블-1-300x511.jpg'},
+302:{t:'레 미제라블 2',a:'빅토르 위고',c:''},303:{t:'레 미제라블 3',a:'빅토르 위고',c:''},
+304:{t:'레 미제라블 4',a:'빅토르 위고',c:''},305:{t:'레 미제라블 5',a:'빅토르 위고',c:''},
+306:{t:'관객모독',a:'페터 한트케',c:''},307:{t:'더블린 사람들',a:'제임스 조이스',c:''},
+308:{t:'에드거 앨런 포 단편선',a:'에드거 앨런 포',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/308_애드거-앨런-포-단편선-300x511.jpg'},
+309:{t:'보이체크·당통의 죽음',a:'게오르크 뷔히너',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/309_보이체크-당통의-죽음-300x511.jpg'},
+310:{t:'노르웨이의 숲',a:'무라카미 하루키',c:''},311:{t:'운명론자 자크와 그의 주인',a:'드니 디드로',c:''},
+312:{t:'헤밍웨이 단편선 1',a:'헤밍웨이',c:''},313:{t:'헤밍웨이 단편선 2',a:'헤밍웨이',c:''},
+314:{t:'피라미드',a:'윌리엄 골딩',c:''},315:{t:'닫힌 방',a:'사르트르',c:''},
+316:{t:'등대로',a:'버지니아 울프',c:''},317:{t:'한국 희곡선 1',a:'송영',c:''},
+318:{t:'한국 희곡선 2',a:'송영',c:''},319:{t:'여자의 일생',a:'기 드 모파상',c:''},
+320:{t:'의식',a:'세스 노터봄',c:''},321:{t:'육체의 악마',a:'레몽 라디게',c:''},
+322:{t:'감정 교육 1',a:'플로베르',c:''},323:{t:'감정 교육 2',a:'플로베르',c:''},
+324:{t:'불타는 평원',a:'후안 룰포',c:''},325:{t:'위대한 몬느',a:'알랭푸르니에',c:''},
+326:{t:'라쇼몬',a:'아쿠타가와 류노스케',c:''},327:{t:'반바지 당나귀',a:'앙리 보스코',c:''},
+328:{t:'정복자들',a:'앙드레 말로',c:''},329:{t:'우리 동네 아이들 1',a:'나지브 마흐푸즈',c:''},
+330:{t:'우리 동네 아이들 2',a:'나지브 마흐푸즈',c:''},331:{t:'개선문 1',a:'레마르크',c:''},
+332:{t:'개선문 2',a:'레마르크',c:''},333:{t:'사바나의 개미 언덕',a:'치누아 아체베',c:''},
+334:{t:'게걸음으로',a:'귄터 그라스',c:''},335:{t:'코스모스',a:'곰브로비치',c:''},
+336:{t:'좁은 문',a:'앙드레 지드',c:''},337:{t:'암 병동 1',a:'솔제니친',c:''},
+338:{t:'암 병동 2',a:'솔제니친',c:''},339:{t:'피의 꽃잎들',a:'응구기 와 시옹오',c:''},
+340:{t:'운명',a:'임레 케르테스',c:''},341:{t:'벌거벗은 자와 죽은 자 1',a:'노먼 메일러',c:''},
+342:{t:'벌거벗은 자와 죽은 자 2',a:'노먼 메일러',c:''},
+343:{t:'시지프 신화',a:'알베르 카뮈',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/시지프-신화_표1이미지-300x511.jpg'},
+344:{t:'뇌우',a:'차오위',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/344_뇌우_표11-300x509.jpg'},
+345:{t:'모옌 중단편선',a:'모옌',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/345_모옌-중단편선_표1-300x510.jpg'},
+346:{t:'일야서',a:'한사오궁',c:''},347:{t:'상속자들',a:'윌리엄 골딩',c:''},
+348:{t:'설득',a:'제인 오스틴',c:''},349:{t:'히로시마 내 사랑',a:'뒤라스',c:''},
+350:{t:'오 헨리 단편선',a:'오 헨리',c:''},351:{t:'올리버 트위스트 1',a:'찰스 디킨스',c:''},
+352:{t:'올리버 트위스트 2',a:'찰스 디킨스',c:''},353:{t:'전쟁과 평화 1',a:'톨스토이',c:''},
+354:{t:'전쟁과 평화 2',a:'톨스토이',c:''},355:{t:'전쟁과 평화 3',a:'톨스토이',c:''},
+356:{t:'전쟁과 평화 4',a:'톨스토이',c:''},357:{t:'다시 찾은 브라이즈헤드',a:'에벌린 워',c:''},
+358:{t:'아무도 대령에게 편지하지 않다',a:'마르케스',c:''},359:{t:'사양',a:'다자이 오사무',c:''},
+360:{t:'좌절',a:'임레 케르테스',c:''},361:{t:'닥터 지바고 1',a:'파스테르나크',c:''},
+362:{t:'닥터 지바고 2',a:'파스테르나크',c:''},363:{t:'노생거 사원',a:'제인 오스틴',c:''},
+364:{t:'개구리',a:'모옌',c:''},365:{t:'마왕',a:'미셸 투르니에',c:''},
+366:{t:'맨스필드 파크',a:'제인 오스틴',c:''},367:{t:'이선 프롬',a:'이디스 워튼',c:''},
+368:{t:'여름',a:'이디스 워튼',c:''},369:{t:'나는 고백한다 1',a:'자우메 카브레',c:''},
+370:{t:'나는 고백한다 2',a:'자우메 카브레',c:''},371:{t:'나는 고백한다 3',a:'자우메 카브레',c:''},
+372:{t:'태엽 감는 새 연대기 1',a:'무라카미 하루키',c:''},373:{t:'태엽 감는 새 연대기 2',a:'무라카미 하루키',c:''},
+374:{t:'태엽 감는 새 연대기 3',a:'무라카미 하루키',c:''},
+375:{t:'대사들',a:'헨리 제임스',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/대사들_1_표1-300x505.jpg'},
+376:{t:'대사들 2',a:'헨리 제임스',c:''},377:{t:'족장의 가을',a:'마르케스',c:''},
+378:{t:'핏빛 자오선',a:'코맥 매카시',c:''},379:{t:'모두 다 예쁜 말들',a:'코맥 매카시',c:''},
+380:{t:'국경을 넘어',a:'코맥 매카시',c:''},381:{t:'평원의 도시들',a:'코맥 매카시',c:''},
+382:{t:'만년',a:'다자이 오사무',c:''},383:{t:'반항하는 인간',a:'알베르 카뮈',c:''},
+384:{t:'악령 1',a:'도스토예프스키',c:''},385:{t:'악령 2',a:'도스토예프스키',c:''},
+386:{t:'악령 3',a:'도스토예프스키',c:''},387:{t:'태평양을 막는 제방',a:'뒤라스',c:''},
+388:{t:'남아있는 나날',a:'가즈오 이시구로',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/388_남아-있는-나날_표12-300x512.jpg'},
+389:{t:'앙리 브륄라르의 생애',a:'스탕달',c:''},390:{t:'찻집',a:'라오서',c:''},
+391:{t:'태어나지 않은 아이를 위한 기도',a:'임레 케르테스',c:''},
+392:{t:'서머싯 몸 단편선 1',a:'서머싯 몸',c:''},393:{t:'서머싯 몸 단편선 2',a:'서머싯 몸',c:''},
+394:{t:'케이크와 맥주',a:'서머싯 몸',c:''},395:{t:'월든',a:'소로',c:''},
+396:{t:'모래 사나이',a:'E.T.A. 호프만',c:''},397:{t:'검은 책 1',a:'오르한 파묵',c:''},
+398:{t:'검은 책 2',a:'오르한 파묵',c:''},
+399:{t:'방랑자들',a:'올가 토카르추크',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/방랑자들_표1+띠지-300x508.jpg'},
+400:{t:'시여, 침을 뱉어라',a:'김수영',c:''},401:{t:'환락의 집 1',a:'이디스 워튼',c:''},
+402:{t:'환락의 집 2',a:'이디스 워튼',c:''},403:{t:'달려라 메로스',a:'다자이 오사무',c:''},
+404:{t:'아버지와 자식',a:'이반 투르게네프',c:''},405:{t:'청부 살인자의 성모',a:'페르난도 바예호',c:''},
+406:{t:'세피아빛 초상',a:'이사벨 아옌데',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/세피아빛초상_표1-300x511.jpg'},
+407:{t:'사기 열전 1',a:'사마천',c:''},408:{t:'사기 열전 2',a:'사마천',c:''},
+409:{t:'사기 열전 3',a:'사마천',c:''},410:{t:'사기 열전 4',a:'사마천',c:''},
+411:{t:'이상 시 전집',a:'이상',c:''},412:{t:'어둠 속의 사건',a:'발자크',c:''},
+413:{t:'태평천하',a:'채만식',c:''},414:{t:'노스트로모 1',a:'콘래드',c:''},
+415:{t:'노스트로모 2',a:'콘래드',c:''},416:{t:'제르미날 1',a:'에밀 졸라',c:''},
+417:{t:'제르미날 2',a:'에밀 졸라',c:''},418:{t:'명인',a:'가와바타 야스나리',c:''},
+419:{t:'핀처 마틴',a:'윌리엄 골딩',c:''},420:{t:'사라진·샤베르 대령',a:'발자크',c:''},
+421:{t:'빅 서',a:'잭 케루악',c:''},422:{t:'코뿔소',a:'이오네스코',c:''},
+423:{t:'블랙박스',a:'아모스 오즈',c:''},424:{t:'고양이 눈 1',a:'마거릿 애트우드',c:''},
+425:{t:'고양이 눈 2',a:'마거릿 애트우드',c:''},426:{t:'도둑 신부 1',a:'마거릿 애트우드',c:''},
+427:{t:'도둑 신부 2',a:'마거릿 애트우드',c:''},428:{t:'슈니츨러 작품선',a:'슈니츨러',c:''},
+429:{t:'세계의 끝과 하드보일드 원더랜드 1',a:'무라카미 하루키',c:''},
+430:{t:'세계의 끝과 하드보일드 원더랜드 2',a:'무라카미 하루키',c:''},
+431:{t:'멜랑콜리아',a:'욘 포세',c:''},432:{t:'도적들',a:'실러',c:''},
+433:{t:'예브게니 오네긴·대위의 딸',a:'푸슈킨',c:''},434:{t:'초대받은 여자 1',a:'시몬 드 보부아르',c:''},
+435:{t:'초대받은 여자 2',a:'시몬 드 보부아르',c:''},436:{t:'미들마치 1',a:'조지 엘리엇',c:''},
+437:{t:'미들마치 2',a:'조지 엘리엇',c:''},438:{t:'이반 일리치의 죽음',a:'톨스토이',c:''},
+439:{t:'캔터베리 이야기 1',a:'제프리 초서',c:''},440:{t:'캔터베리 이야기 2',a:'제프리 초서',c:''},
+441:{t:'목로주점 1',a:'에밀 졸라',c:''},442:{t:'목로주점 2',a:'에밀 졸라',c:''},
+443:{t:'가난한 사람들',a:'도스토예프스키',c:''},444:{t:'마차오 사전 1',a:'한사오궁',c:''},
+445:{t:'마차오 사전 2',a:'한사오궁',c:''},446:{t:'집으로 날아가다',a:'랠프 엘리슨',c:''},
+447:{t:'집으로부터 멀리',a:'피터 케리',c:''},448:{t:'바스커빌가의 사냥개',a:'아서 코넌 도일',c:''},
+449:{t:'사냥꾼의 스케치',a:'이반 투르게네프',c:''},450:{t:'필경사 바틀비',a:'허먼 멜빌',c:''},
+451:{t:'8월은 악마의 달',a:'에드나 오브라이언',c:''},452:{t:'헌등사',a:'다와다 요코',c:''},
+453:{t:'색, 계',a:'장아이링',c:''},454:{t:'겨울 여행',a:'자우메 카브레',c:''},
+455:{t:'기억의 빛',a:'마이클 온다치',c:''},
+456:{t:'표범',a:'람페두사',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/452_표범_표지띠지4-3-300x511.jpg'},
+457:{t:'크리스마스 캐럴',a:'찰스 디킨스',c:''},458:{t:'버진 수어사이드',a:'제프리 유제니디스',c:''},
+459:{t:'미들섹스 1',a:'제프리 유제니디스',c:''},460:{t:'미들섹스 2',a:'제프리 유제니디스',c:''},
+461:{t:'사랑에 대하여',a:'안톤 체호프',c:''},462:{t:'나',a:'페터 플람',c:''},
+463:{t:'지킬 박사와 하이드 씨',a:'스티븐슨',c:''},464:{t:'박지원 소설선',a:'박지원',c:''},
+465:{t:'안과 겉·결혼·여름',a:'알베르 카뮈',c:''},466:{t:'소중한 저주',a:'제럴드 머네인',c:''},
+467:{t:'향성',a:'나탈리 사로트',c:''},468:{t:'퀴어',a:'윌리엄 S. 버로스',c:''},
+469:{t:'악수도 없이 헤어졌다',a:'피천득',c:''},470:{t:'버지니아 울프 단편선',a:'버지니아 울프',c:''},
+471:{t:'쓰가루',a:'다자이 오사무',c:''},472:{t:'사람은 무엇으로 사는가',a:'톨스토이',c:''},
+473:{t:'도련님',a:'나쓰메 소세키',c:''},474:{t:'명심보감',a:'범입본',c:''},
+475:{t:'체호프 희곡선',a:'안톤 체호프',c:''},476:{t:'레볼루셔너리 로드',a:'리처드 예이츠',c:''},
+484:{t:'댈러웨이 부인',a:'버지니아 울프',c:'https://minumsa.minumsa.com/wp-content/uploads/bookcover/484_댈러웨이부인_표1-300x511.jpg'},
+};
+
+const BOOKS = [
+{vol:5,title:'동물농장',author:'조지 오웰',self:'자기기만',other:'억압',relation:'지배-복종',pattern:'P1',tragedy:'평등에 commit하면 commit 자체가 권력이 되어 평등을 잡아먹는 비극',quote:'인간은 생산하지 않으면서 소비하는 유일한 동물.',memo:'생산과 소비자체가 인간중심관념 아닌가?',src:'ilryeok'},
+{vol:18,title:'고리오 영감',author:'발자크',self:'자기보존',other:'착취',relation:'희생-배반',pattern:'P2',tragedy:'딸에게 줄수록 돌아오는 것이 줄어드는 비극 — dG/dF=(−)',quote:'우리의 행복이란 우리 밑바닥에서부터 꼭두부까지 사이에 있는 거야.',memo:'왜 꼭두부?',src:'ilryeok'},
+{vol:44,title:'데미안',author:'헤르만 헤세',self:'자기발견',other:'계몽',relation:'모호-긴장',pattern:'P3',tragedy:'자기 이해 없이 타인을 구하려는 비극',quote:'그 풀이를 할 수 있는 건 누구나 자기 자신뿐이다.',memo:'understanding is explanatory',src:'ilryeok'},
+{vol:95,title:'적과 흑',author:'스탕달',self:'자기초월',other:'유혹',relation:'지배-복종',pattern:'P4',tragedy:'계층을 넘으려다 자신을 잃는 비극',quote:'인간에게 말이 주어진 것은 생각을 숨기기 위해서이다.',memo:'',src:'ilryeok'},
+{vol:130,title:'자기만의 방',author:'버지니아 울프',self:'자기보존',other:'억압',relation:'연대-해방',pattern:'P5',tragedy:'자기만의 방 없이 목소리 내려는 비극',quote:'나는 누구도 미워할 필요가 없습니다.',memo:'경제적 독립이 인식의 독립을 낳는다',src:'ilryeok'},
+{vol:154,title:'카라마조프 가의 형제들',author:'도스토예프스키',self:'자기파괴',other:'착취',relation:'오해-비극',pattern:'P6',tragedy:'아버지의 죄가 아들에게 상속되는 비극',quote:'이 세상에서는 허튼소리들이 너무 많이 필요해.',memo:'useful exists because of useless',src:'ilryeok'},
+{vol:205,title:'테스',author:'토머스 하디',self:'자기파괴',other:'유혹',relation:'희생-배반',pattern:'P7',tragedy:'순결 규범이 순수한 자를 파괴하는 비극',quote:'핏빛 붉은 광선이 될 사람이 도사리고 있음을 예측하지 못했다.',memo:'',src:'ilryeok'},
+{vol:283,title:'엠마',author:'제인 오스틴',self:'자기기만',other:'계몽',relation:'모호-긴장',pattern:'P3',tragedy:'선의의 간섭이 관계를 꼬이게 하는 비극',quote:'짝짝이 맞아떨어지는 것은 단순한 행운이 아니랍니다.',memo:'',src:'ilryeok'},
+{vol:301,title:'레 미제라블',author:'빅토르 위고',self:'자기초월',other:'억압',relation:'연대-해방',pattern:'P8',tragedy:'법의 정의가 인간의 선을 짓밟는 비극',quote:'사색은 지성의 노동이고, 몽상은 지성의 향락이다.',memo:'행동이 뒤따르면 사색.',src:'ilryeok'},
+{vol:309,title:'보이체크·당통의 죽음',author:'뷔히너',self:'자기파괴',other:'무관심',relation:'지배-복종',pattern:'P9',tragedy:'가난이 존엄을 빼앗는 비극',quote:'죽음에는 희망이라는 게 없어.',memo:'Golden Cage 프레임워크와 연결',src:'both',tv:{ep:27,theme:'숨은 명작',result:'우승',comment:'빈곤과 억압 속 인간성 붕괴'}},
+{vol:465,title:'안과 겉·결혼·여름',author:'알베르 카뮈',self:'자기발견',other:'무관심',relation:'모호-긴장',pattern:'P10',tragedy:'명료함을 추구하다 모호함에 갇히는 비극',quote:'나 자신을 내맡김으로써 사랑할 수 있었으니, 마침내 나는 나 자신이 된 것이다.',memo:'모호함의 극치',src:'ilryeok'},
+{vol:484,title:'댈러웨이 부인',author:'버지니아 울프',self:'자기보존',other:'무관심',relation:'모호-긴장',pattern:'P10',tragedy:'일상의 표면 아래 죽음이 흐르는 비극',quote:'',memo:'',src:'ilryeok'},
+{vol:13,title:'이반 데니소비치',author:'솔제니친',self:'자기보존',other:'억압',relation:'지배-복종',pattern:'P9',tragedy:'체제가 개인의 존엄을 빼앗는 비극',quote:'사람은 자유를 잃어도 마음까지는 빼앗기지 않는다.',memo:'',src:'tv',tv:{ep:28,theme:'눈물 없이 못 읽는 소설',result:'우승',comment:'수용소에서의 인간 존엄'}},
+{vol:27,title:'다섯째 아이',author:'도리스 레싱',self:'자기보존',other:'무관심',relation:'오해-비극',pattern:'P6',tragedy:'타자에 대한 공포가 가정을 파괴하는 비극',quote:'',memo:'',src:'tv',tv:{ep:29,theme:'미스터리 & 공포',result:'준우승',comment:'완벽한 가정의 파국'}},
+{vol:65,title:'소망 없는 불행',author:'페터 한트케',self:'자기파괴',other:'무관심',relation:'희생-배반',pattern:'P7',tragedy:'어머니의 삶이 묵살당하는 비극',quote:'',memo:'',src:'tv',tv:{ep:28,theme:'눈물 없이 못 읽는 소설',result:'준우승',comment:'어머니의 삶을 담담하게 기록'}},
+{vol:75,title:'위대한 개츠비',author:'피츠제럴드',self:'자기기만',other:'유혹',relation:'희생-배반',pattern:'P4',tragedy:'허황된 꿈이 파국으로 귀결되는 비극',quote:'우리는 계속 서서히 물결에 밀려 나아가요.',memo:'',src:'tv',tv:{ep:26,theme:'파국 로맨스',result:'우승',comment:'1920년대 허황된 꿈과 사랑'}},
+{vol:104,title:'네루다의 우편배달부',author:'스카르메타',self:'자기발견',other:'계몽',relation:'연대-해방',pattern:'P3',tragedy:'시를 통한 각성이 현실에 부딪히는 비극',quote:'',memo:'',src:'tv',tv:{ep:24,theme:'성장소설',result:'준우승',comment:'시인을 통해 세상을 깨닫다'}},
+{vol:118,title:'폭풍의 언덕',author:'에밀리 브론테',self:'자기파괴',other:'유혹',relation:'희생-배반',pattern:'P7',tragedy:'격정적 사랑이 복수로 변하는 비극',quote:'',memo:'',src:'tv',tv:{ep:26,theme:'파국 로맨스',result:'준우승',comment:'치명적 사랑과 복수'}},
+{vol:153,title:'구덩이',author:'플라토노프',self:'자기파괴',other:'억압',relation:'지배-복종',pattern:'P1',tragedy:'혁명의 이상이 허무로 전락하는 비극',quote:'',memo:'',src:'tv',tv:{ep:27,theme:'숨은 명작',result:'준우승',comment:'혁명 후 소련의 역설'}},
+{vol:169,title:'포스트맨은 벨을 두 번 울린다',author:'케인',self:'자기파괴',other:'유혹',relation:'오해-비극',pattern:'P7',tragedy:'운명적 만남이 파멸로 이끄는 비극',quote:'',memo:'',src:'tv',tv:{ep:26,theme:'파국 로맨스',result:'',comment:'치정과 범죄'}},
+{vol:248,title:'인형의 집',author:'입센',self:'자기발견',other:'억압',relation:'연대-해방',pattern:'P5',tragedy:'인형에서 인간으로 깨어나는 비극',quote:'나는 먼저 인간이고, 그다음이 여성입니다.',memo:'',src:'tv',tv:{ep:24,theme:'성장소설',result:'우승',comment:'인형에서 인간으로'}},
+{vol:290,title:'구르브 연락 없다',author:'멘도사',self:'자기보존',other:'무관심',relation:'모호-긴장',pattern:'P10',tragedy:'현대인의 소외가 침묵으로 귀결되는 비극',quote:'',memo:'',src:'tv',tv:{ep:27,theme:'숨은 명작',result:'',comment:'소외와 침묵'}},
+{vol:308,title:'에드거 앨런 포 단편선',author:'에드거 앨런 포',self:'자기파괴',other:'무관심',relation:'오해-비극',pattern:'P9',tragedy:'내면의 공포가 자기를 삼키는 비극',quote:'',memo:'',src:'tv',tv:{ep:29,theme:'미스터리 & 공포',result:'우승',comment:'심리적 공포의 효시'}},
+{vol:344,title:'뇌우',author:'차오위',self:'자기기만',other:'유혹',relation:'지배-복종',pattern:'P2',tragedy:'가문의 위선이 몰락을 부르는 비극',quote:'',memo:'',src:'tv',tv:{ep:27,theme:'숨은 명작',result:'',comment:'상류층 가문 몰락'}},
+{vol:345,title:'모옌 중단편선',author:'모옌',self:'자기기만',other:'억압',relation:'오해-비극',pattern:'P1',tragedy:'농촌의 모순이 풍자로 드러나는 비극',quote:'',memo:'',src:'tv',tv:{ep:25,theme:'노벨문학상',result:'',comment:'농촌의 블랙코미디'}},
+{vol:375,title:'대사들',author:'헨리 제임스',self:'자기발견',other:'계몽',relation:'모호-긴장',pattern:'P3',tragedy:'구출하려다 자신을 발견하는 비극',quote:'',memo:'',src:'tv',tv:{ep:24,theme:'성장소설',result:'',comment:'늦깎이 성장'}},
+{vol:388,title:'남아있는 나날',author:'이시구로',self:'자기기만',other:'억압',relation:'희생-배반',pattern:'P4',tragedy:'품위라는 가면에 commit하여 사랑과 인생을 놓치는 비극',quote:'',memo:'',src:'tv',tv:{ep:25,theme:'노벨문학상',result:'우승',comment:'집사의 품위와 후회'}},
+{vol:399,title:'방랑자들',author:'토카르추크',self:'자기발견',other:'무관심',relation:'모호-긴장',pattern:'P10',tragedy:'어디에도 속하지 못하는 비극',quote:'',memo:'',src:'tv',tv:{ep:25,theme:'노벨문학상',result:'',comment:'이동과 경계 넘기'}},
+{vol:406,title:'세피아빛 초상',author:'아옌데',self:'자기발견',other:'억압',relation:'연대-해방',pattern:'P5',tragedy:'역사 속 여성의 기억이 지워지는 비극',quote:'',memo:'',src:'tv',tv:{ep:24,theme:'성장소설',result:'',comment:'여성의 자아 찾기'}},
+];
+
+const PATTERNS = [
+{id:'P1',line:'이상에 commit → commit 자체가 권력이 되어 이상을 잡아먹는다',startup:'비전에 과몰입하면 비전이 독재가 된다. 창업자의 conviction이 팀의 flexibility를 질식시키는 순간.',books:[5,153,345]},
+{id:'P2',line:'헌신에 commit → 받는 자가 착취자로 변한다',startup:'고객에게 줄수록 당연시된다. Product-market fit을 넘어 과잉헌신하면 수익모델이 죽는다 — dG/dF=(−).',books:[18,344]},
+{id:'P3',line:'타인 구원에 commit → 자기를 모른 채 세상을 고치려 한다',startup:'시장을 바꾸겠다는 사명감이 자기 역량 파악 없이 작동하면, pivot이 아니라 표류가 된다.',books:[44,283,104,375]},
+{id:'P4',line:'계층 초월에 commit → 가면이 얼굴을 잡아먹는다',startup:'투자자·시장의 기대에 맞춰 포장할수록 원래의 핵심 가치가 희석된다.',books:[95,75,388]},
+{id:'P5',line:'자원 없이 목소리에 commit → 구조가 개인을 침묵시킨다',startup:'자본 없이 시장을 바꾸려는 것. 500파운드(=런웨이)가 있어야 자유롭게 말할 수 있다.',books:[130,248,406]},
+{id:'P6',line:'선대의 유산에 commit → 죄가 다음 세대로 상속된다',startup:'창업자의 초기 기술부채·문화부채가 후임 팀에 전이된다. 레거시 시스템의 저주.',books:[154,27]},
+{id:'P7',line:'순수함에 commit → 규범이 순수한 자를 먼저 파괴한다',startup:'시장의 규칙을 무시한 순수한 제품은 규제·경쟁에 먼저 죽는다. 이상주의자의 함정.',books:[205,118,65,169]},
+{id:'P8',line:'정의에 commit → 법이 선을 짓밟는다',startup:'규정 준수에 과몰입하면 혁신이 죽는다. Compliance가 mission을 잡아먹는 순간.',books:[301]},
+{id:'P9',line:'존엄에 commit → 체제가 존엄을 빼앗는다',startup:'bootstrap으로 독립을 지키려다 자원 부족에 무너진다. 자존심이 생존을 이기면 안 된다.',books:[309,13,308]},
+{id:'P10',line:'명료함에 commit → 모호함 속에서 길을 잃는다',startup:'Strategic ambiguity를 유지해야 할 때 명확한 답을 강요하면 선택지가 죽는다. dR/dF=(−).',books:[465,484,290,399]},
+];
+
+const EPISODES = [
+{num:24,theme:'성장소설',works:[{vol:248,result:'우승'},{vol:406,result:''},{vol:104,result:'준우승'},{vol:375,result:''}]},
+{num:25,theme:'노벨문학상',works:[{vol:345,result:''},{vol:388,result:'우승'},{vol:399,result:''}]},
+{num:26,theme:'파국 로맨스',works:[{vol:118,result:'준우승'},{vol:75,result:'우승'},{vol:169,result:''}]},
+{num:27,theme:'숨은 명작',works:[{vol:290,result:''},{vol:153,result:'준우승'},{vol:344,result:''},{vol:309,result:'우승'}]},
+{num:28,theme:'눈물 없이 못 읽는 소설',works:[{vol:65,result:'준우승'},{vol:13,result:'우승'}]},
+{num:29,theme:'미스터리 & 공포',works:[{vol:308,result:'우승'},{vol:27,result:'준우승'}]},
+];
+
+// CAGE_TENSIONS: 혜진×민경 토론 결과 — commitment(C)↔flexibility(F) 동적 트레이드오프
+// 혜진: "절제된 슬픔에서 진짜 무게가 나온다" / 민경: "어둠을 직시해야 빛이 보인다"
+// 창업 프레임: 서생적 문제의식(왜 망하는가) + 상인적 현실감각(어떻게 살아남는가)
+const CAGE_TENSIONS = {
+77:{x:'진실',y:'권력',line:'진실에 commit하면 체제가 파괴하고, 체제에 commit하면 2+2=5가 진실이 된다',
+  hj:'빅브라더는 결국 언어를 통제했어요. 창업자가 지표를 조작하기 시작하면 같은 일이 벌어져요.',
+  mk:'초인이 다 어디 있어요. 권력 앞에서 다 범인이지. 스타트업도 시리즈B 지나면 투자자의 언어를 말하게 돼요.'},
+112:{x:'자유의지',y:'선행강제',line:'악을 선택할 자유를 빼앗으면 선도 의미를 잃는다',
+  hj:'고객에게 선택지를 줘야 진짜 선택이에요. 강제된 리텐션은 선이 아니에요.',
+  mk:'자유의지 없는 선행은 알고리즘이지 윤리가 아니에요.'},
+154:{x:'자유',y:'안전',line:'빵을 주면 자유를 바치고, 자유를 주면 불안에 떤다',
+  hj:'런웨이(빵)를 받으면 투자자의 방향을 따르게 돼요. 자유를 지키면 내일이 불안하고.',
+  mk:'대심문관이 말하잖아요 — 인간은 자유보다 빵을 원한다고. 창업자도 결국 시리즈A를 원해요.'},
+239:{x:'이성',y:'변덕',line:'인간은 2+2=4를 알면서도 2+2=5를 원한다',
+  hj:'데이터가 말하는 것과 직감이 말하는 것이 다를 때, 그 갈등이 창업자의 진짜 시험이에요.',
+  mk:'지하인간의 반항이에요. 합리적 판단만 하면 창업 자체를 안 하겠죠.'},
+266:{x:'무감정',y:'사회규범',line:'감정을 교환가치로 전환하기를 거부하면 사회가 처벌한다',
+  hj:'감정노동을 거부하는 창업자는 투자자 미팅에서 죽어요.',
+  mk:'뫼르소는 엄마 장례식에서 안 울었다고 사형당했어요. VC 앞에서 열정 안 보이면 같은 꼴이에요.'},
+267:{x:'무력',y:'연대',line:'전염병 앞에서도 함께 싸우겠다고 commit하는 것',
+  hj:'카뮈의 리외가 보여준 거예요. 이길 수 없어도 함께하겠다는 결단. 코파운더 관계의 본질.',
+  mk:'승산이 없어도 싸우는 게 연대예요. 그게 팀이에요.'},
+273:{x:'순수지성',y:'현실참여',line:'지식의 유희에 commit할수록 세상과의 접점을 잃는다',
+  hj:'기술만 파는 창업자가 시장을 잊으면 유리구슬놀이가 돼요.',
+  mk:'서생적 문제의식은 좋지만 상인적 현실감각 없이는 논문이지 사업이 아니에요.'},
+343:{x:'부조리',y:'의미',line:'삶에 의미가 없다는 것을 알면서도 살아가겠다고 commit하는 것',
+  hj:'시지프스의 바위를 매일 밀어올리는 게 창업이에요. 그런데 카뮈는 시지프스가 행복하다고 했죠.',
+  mk:'부조리를 직시하고도 매일 출근하는 것. 그게 창업자의 낙관이에요.'},
+388:{x:'품위',y:'감정',line:'완벽한 집사로 commit하여 사랑 고백의 순간을 놓치면 남은 나날은 후회뿐이다',
+  hj:'이시구로가 월드컵 노벨상편에서 우승한 이유예요. 절제가 만드는 슬픔이 가장 깊어요. 창업자가 체면 때문에 pivot을 못 하면 남은 나날은 후회뿐이에요.',
+  mk:'스티븐스는 전문성에 갇혀서 인간을 놓쳤어요. 제품에 갇혀서 고객을 놓치는 것과 같아요.'},
+456:{x:'변화',y:'영속',line:'모든 것이 변하지 않으려면 모든 것이 변해야 한다',
+  hj:'살리나 공작의 말이에요. 조직이 생존하려면 끊임없이 변해야 해요. 변하지 않으려고 변하는 역설.',
+  mk:'이게 pivot의 본질이에요. 미션을 지키려면 전략은 바꿔야 해요.'},
+1:{x:'부양',y:'존재',line:'가족을 위해 일하는 것이 가족에게서 분리되는 것이 된다',
+  hj:'그레고르의 비극이에요. 회사를 위해 사는 창업자가 정작 자기 삶에서 벌레가 되는 것.',
+  mk:'변신은 제 인생 4번 읽은 책이에요. 매번 다른 게 보여요. 지금은 역할과 존재의 괴리가 보여요.'},
+3:{x:'복수',y:'정의',line:'아버지의 원수를 갚겠다는 commit이 주변 모두를 파멸로 끌어들인다',
+  hj:'경쟁사를 이기겠다는 복수심이 팀을 태워먹어요.',
+  mk:'햄릿의 지연은 우유부단이 아니에요. 복수의 대가를 아는 거예요.'},
+5:{x:'평등',y:'권력',line:'평등에 commit하면 commit 자체가 권력이 되어 평등을 잡아먹는다',
+  hj:'나폴레옹 돼지예요. 수평적 조직을 만들겠다고 한 창업자가 가장 독재적이 되는 아이러니.',
+  mk:'동물농장은 P1의 교과서예요. 모든 동물은 평등하다, 그러나 어떤 동물은 더 평등하다.'},
+6:{x:'인종',y:'자유',line:'피부색에 commit된 사회에서 자유는 항상 도망이다',
+  hj:'짐이 강 위에서만 자유로운 것처럼, 어떤 창업자는 특정 시장에서만 자유로워요.',
+  mk:'구조적 불평등 위에서 능력주의를 말하는 건 사기예요.'},
+7:{x:'진보',y:'폭력',line:'식민문명이 진보라고 부르는 것이 원주민에겐 파괴다',
+  hj:'디지털 전환이 진보라고 하지만, 기존 업종 종사자에겐 파괴예요.',
+  mk:'커츠의 마지막 말 "공포! 공포!" — 실리콘밸리의 disruption 서사 뒤에 숨은 진짜.'},
+13:{x:'생존',y:'존엄',line:'수용소에서 살아남으려면 인간이기를 포기해야 하는가',
+  hj:'월드컵 눈물편 우승작이에요. 살아남는 것과 인간답게 사는 것의 최소 단위. 번아웃 상태의 창업자가 매일 묻는 질문.',
+  mk:'이반 데니소비치의 하루는 극한의 flexibility예요. 존엄을 잃지 않으면서 시스템에 적응하는 법.'},
+18:{x:'헌신',y:'존엄',line:'딸에게 줄수록 돌아오는 것이 줄어든다 — dG/dF=(−)',
+  hj:'고리오 영감이 dG/dF=(−)의 원조예요. 사랑이라는 이름의 투자가 감사라는 이름의 수익을 기대하는 순간.',
+  mk:'고객에게 무한히 줘도 충성은 안 와요. 가격이 아니라 존엄을 줘야 해요.'},
+19:{x:'언어',y:'폭력',line:'말로 세상을 바꾸려는 commit이 결국 침묵으로 끝난다',
+  hj:'로라의 유리동물원이에요. 아름다운 것은 깨지기 쉬워요.',
+  mk:'피칭 덱이 세상을 바꾸지는 않아요. 실행이 말해야 해요.'},
+21:{x:'지식',y:'영혼',line:'지식에 commit하여 영혼을 팔면 얻은 것이 잃은 것보다 작다',
+  hj:'파우스트의 거래예요. 성장을 위해 가치를 팔면 성장 자체가 의미를 잃어요.',
+  mk:'기술부채도 결국 영혼을 파는 거예요. 지금 빠르게 가려고 미래를 저당잡는 것.'},
+27:{x:'정상',y:'타자',line:'완벽한 가정을 지킬수록 다른 존재를 배제한다',
+  hj:'다섯째 아이는 월드컵 공포편 준우승이에요. 완벽한 팀을 만들겠다고 다른 사람을 배제하면 팀이 죽어요.',
+  mk:'레싱이 천재인 게, 공포의 원천이 괴물이 아니라 정상성의 폭력이라는 거예요.'},
+30:{x:'교육',y:'본능',line:'문명의 교육이 야성을 지울수록 생존력도 함께 죽는다',
+  hj:'MBA가 창업자의 야성을 길들이면 안 돼요.',
+  mk:'벅은 야성을 되찾고서야 살아남았어요. 시장의 야생에서 교과서는 안 통해요.'},
+34:{x:'기억',y:'망각',line:'기억에 commit하면 고통, 망각에 commit하면 자기가 사라진다',
+  hj:'실패한 프로젝트를 기억하면 아프지만, 잊으면 같은 실수를 반복해요.',
+  mk:'기억은 prior예요. prior가 없으면 학습이 안 돼요.'},
+36:{x:'권태',y:'열정',line:'불륜에 commit할수록 일상이 더 지루해진다',
+  hj:'보바리 부인의 교훈이에요. 새 프로젝트에 빠질수록 본업이 더 지루해져요. 사이드 프로젝트의 함정.',
+  mk:'권태를 이기려고 외부 자극에 의존하면 중독이에요. 내부에서 의미를 찾아야 해요.'},
+43:{x:'기다림',y:'부재',line:'오지 않는 고도를 기다리겠다고 commit하는 것',
+  hj:'Product-market fit을 기다리는 것과 같아요. 오지 않을 수도 있어요.',
+  mk:'고도는 안 와요. 그런데 기다림 자체가 존재의 의미가 되기도 해요. 그게 인내예요.'},
+44:{x:'모방',y:'자기됨',line:'타인의 길을 따를수록 자기 길에서 멀어진다',
+  hj:'제 인생책이에요. "새는 알에서 나오려고 투쟁한다" — 남의 비즈니스 모델을 따르면 자기 알을 못 깨요.',
+  mk:'데미안은 월드컵 베스트셀러편 우승이에요. 불행한 나를 사랑하며 사는 법을 가르쳐요.'},
+47:{x:'순수',y:'위선',line:'어른 세계의 위선을 거부할수록 갈 곳이 없어진다',
+  hj:'홀든의 비극이에요. 시장의 위선을 거부하면 시장에서 쫓겨나요.',
+  mk:'순수한 비전을 지키려면 어느 정도의 위선(=타협)은 생존 기술이에요.'},
+50:{x:'방황',y:'구도',line:'인생의 의미를 찾아 떠날수록 출발점으로 돌아온다',
+  hj:'싯다르타의 여정이에요. 극복되지 않는 것들이 세상에 훨씬 더 많아요. 그래도 강물처럼 흘러가는 것.',
+  mk:'pivot을 반복하면 결국 처음의 직관으로 돌아오는 경우가 많아요.'},
+53:{x:'명예',y:'복수',line:'명예 회복에 commit할수록 복수의 칼날이 자기를 향한다',
+  hj:'경쟁사에 빼앗긴 시장을 되찾겠다는 집착이 자기를 태워요.',
+  mk:'몬테크리스토는 복수에 성공했지만 행복은 못 찾았어요.'},
+56:{x:'전통',y:'자유',line:'가문의 전통에 commit할수록 개인의 자유가 질식한다',
+  hj:'가업을 잇는 창업은 전통과 혁신 사이에서 질식해요.',
+  mk:'부덴브로크 가의 몰락이에요. 4세대째 예술가가 나오면 사업은 끝나요.'},
+58:{x:'자유',y:'고독',line:'사회와의 유대를 끊고 자유에 commit하면 고독만 남는다',
+  hj:'싯다르타가 깨달음을 얻었지만 대가는 고독이었어요. 1인 창업의 자유와 외로움.',
+  mk:'독립적 결정의 자유는 혼자 감당해야 하는 무게와 같아요.'},
+65:{x:'기록',y:'망각',line:'어머니의 삶을 기록하려 할수록 글이 삶을 배반한다',
+  hj:'한트케의 절제예요. 월드컵 눈물편 준우승. 슬픔의 최대한 절제가 오히려 더 슬프게 만들어요. 실패 보고서도 마찬가지예요.',
+  mk:'기록은 해석이에요. 객관적 실패 분석이란 없어요. 그래도 기록해야 해요.'},
+75:{x:'꿈',y:'현실',line:'과거의 사랑에 commit할수록 현재가 파멸한다',
+  hj:'개츠비는 월드컵 파국로맨스편 우승이에요. 초기 비전에 집착하면 현재 시장이 안 보여요.',
+  mk:'녹색 불빛을 향해 팔을 뻗는 개츠비. 시리즈B 밸류에이션의 환상이에요.'},
+88:{x:'오만',y:'허영',line:'자기 기준에 commit하면 자유가 남고 타인 시선에 commit하면 자유가 죽는다',
+  hj:'오만과 편견의 교훈이에요. 자기 기준(=제품 철학)을 지키되, 시장의 편견을 이해해야 해요.',
+  mk:'다시도 편견에 갇혀 있었고 엘리자베스도 오만에 갇혀 있었어요. 둘 다 flexibility가 필요했어요.'},
+95:{x:'야망',y:'진심',line:'계층을 넘으려고 가면을 쓸수록 진짜 자기가 죽는다',
+  hj:'줄리앵 소렐이에요. 시장의 기대에 맞춰 포장할수록 원래 가치가 희석돼요.',
+  mk:'가면을 쓰면 투자를 받지만 가면을 벗으면 시장이 떠나요. 어느 쪽이 진짜 자기인가.'},
+99:{x:'야망',y:'가족',line:'정복에 commit할수록 가까운 사람이 죽는다',
+  hj:'맥베스예요. 성장에 미치면 팀이 죽어요.',
+  mk:'왕좌는 얻었지만 잠을 잃었어요. 유니콘은 됐지만 코파운더를 잃은 것.'},
+104:{x:'시',y:'행동',line:'언어로 세상을 깨달을수록 현실과의 괴리가 커진다',
+  hj:'네루다의 우편배달부예요. 비전을 말하는 것과 실행하는 것의 간극.',
+  mk:'시를 배워서 세상이 다르게 보이기 시작했지만, 현실은 여전히 같아요.'},
+109:{x:'겸손',y:'야심',line:'겸손에 commit한 자가 가장 큰 야심을 품고 있다',
+  hj:'톰 존스의 역설이에요. 겸손한 척하는 창업자가 가장 큰 시장을 노려요.',
+  mk:'진짜 겸손은 야심을 숨기는 게 아니라 능력의 한계를 아는 거예요.'},
+118:{x:'격정',y:'복수',line:'사랑에 commit하면 복수가 되고 복수에 commit하면 자기가 죽는다',
+  hj:'히스클리프예요. 월드컵 파국로맨스편 준우승. 시장에 대한 사랑이 독점욕이 되면 같은 비극.',
+  mk:'폭풍의 언덕은 사랑인 줄 알았는데 복수고, 복수인 줄 알았는데 사랑이에요. 창업 동기도 그래요.'},
+130:{x:'빈곤',y:'자립',line:'500파운드가 적개심을 관용으로, 관용을 자유로 바꾼다',
+  hj:'울프의 통찰이에요. 월드컵 여성의날편 우승. 런웨이 = 500파운드. 자본이 있어야 자유롭게 사고해요.',
+  mk:'물질적 조건이 인식의 조건이에요. 시드머니가 사고방식을 바꿔요.'},
+153:{x:'이상',y:'노동',line:'유토피아를 짓겠다고 구덩이를 파면 팔수록 아래로 내려간다',
+  hj:'구덩이는 월드컵 숨은명작편 준우승이에요. 비전을 실현하려고 팔수록 구덩이에 빠지는 역설.',
+  mk:'플라토노프가 천재인 게, 혁명 후 소련을 한 단어로 압축했어요 — 구덩이.'},
+169:{x:'욕망',y:'운명',line:'운명적 끌림에 commit하면 둘 다 파멸한다',
+  hj:'운명적 만남이라고 느끼는 사업 파트너십이 가장 위험해요.',
+  mk:'케인의 세계는 누아르예요. 끌림과 파멸이 한 몸이에요.'},
+172:{x:'환상',y:'현실',line:'환상 속에 살면 현실이 파괴하고 현실에 commit하면 환상이 죽는다',
+  hj:'창업자의 비전(환상)과 시장 현실 사이의 영원한 줄다리기.',
+  mk:'돈키호테는 환상에 살았지만 그 환상이 현실을 바꿨어요. 미쳤다는 소리를 들을 각오가 필요해요.'},
+173:{x:'사랑',y:'죽음',line:'사랑에 commit하면 죽음뿐이고 증오에 commit해도 죽음뿐이다',
+  hj:'로미오와 줄리엣이에요. 시장에 대한 사랑이든 증오든 과몰입은 죽음이에요.',
+  mk:'감정의 양 끝이 같은 결과를 만들어요. 중간에 서는 것이 가장 어려워요.'},
+174:{x:'분노',y:'정의',line:'분노에 commit하면 정의를 얻지만 평화를 잃는다',
+  hj:'분노가 동력이 되는 창업은 오래 못 가요. 분노 다음의 동력이 필요해요.',
+  mk:'아킬레우스의 분노가 일리아스를 시작하지만, 분노만으로는 트로이아를 못 이겨요.'},
+205:{x:'순결규범',y:'순수',line:'사회가 요구하는 순결은 순수한 자를 파괴한다',
+  hj:'테스의 비극이에요. 시장의 규범을 완벽히 따르면 제품의 순수한 가치가 죽어요.',
+  mk:'규범은 순수한 것을 먼저 잡아먹어요. 규제가 혁신을 죽이는 메커니즘과 같아요.'},
+212:{x:'유산',y:'자립',line:'유산을 받으면 자립이 죽고 자립에 commit하면 가난이 따른다',
+  hj:'상속 자금으로 창업하면 절실함이 줄어요. 자기 돈으로 하면 굶어요.',
+  mk:'유산의 무게가 자립의 날개를 꺾어요.'},
+219:{x:'관습',y:'사랑',line:'결혼 관습에 commit하면 사랑이 죽고 사랑에 commit하면 사회가 죽인다',
+  hj:'시장의 관습(=표준)을 따르면 혁신이 죽고, 혁신에 commit하면 시장이 외면해요.',
+  mk:'관습은 안전하지만 지루하고, 사랑은 위험하지만 살아있어요.'},
+234:{x:'가벼움',y:'무거움',line:'존재의 가벼움에 commit하면 아무것도 남지 않고 무거움에 commit하면 짓눌린다',
+  hj:'쿤데라의 핵심이에요. lean startup(가벼움)과 deep tech(무거움) 사이의 창업자 딜레마.',
+  mk:'반복은 무거움을 만들고, 한 번뿐인 것은 가벼움을 만들어요. 창업은 한 번이라 가볍지만, 그래서 무거워요.'},
+248:{x:'순종',y:'주체',line:'좋은 아내로 사는 것과 인간으로 사는 것이 양립할 수 없다',
+  hj:'인형의 집은 월드컵 성장소설편 우승이에요. 좋은 직원으로 사는 것과 자기 사업을 하는 것의 양립 불가.',
+  mk:'노라의 문 닫는 소리가 세계를 바꿨어요. 사직서 내는 소리도 그래요.'},
+278:{x:'인내',y:'패배',line:'파괴될 수 있지만 패배할 수 없다',
+  hj:'산티아고의 선언이에요. 회사가 망할 수 있지만 창업자는 패배할 수 없어요.',
+  mk:'거대한 물고기를 잡았지만 뼈만 남았어요. 그래도 패배가 아니에요. 그게 resilience예요.'},
+279:{x:'전쟁',y:'사랑',line:'전쟁 속에서 사랑에 commit하면 세상이 적이 된다',
+  hj:'레드오션에서 아름다운 제품을 만들겠다는 것. 세상이 적이 되더라도.',
+  mk:'무기여 잘 있거라. 전쟁을 떠나 사랑을 선택하면 탈영병이에요. 시장에서 이탈하면 니치예요.'},
+283:{x:'간섭',y:'자유',line:'선의로 타인의 사랑을 설계할수록 모든 관계가 꼬인다',
+  hj:'엠마의 교훈이에요. 고객의 니즈를 대신 정의하면 관계가 꼬여요.',
+  mk:'선의의 간섭이 가장 위험해요. 고객이 뭘 원하는지는 고객이 알아요.'},
+284:{x:'이론',y:'양심',line:'초인 이론에 commit할수록 인간성이 죽는다',
+  hj:'라스콜니코프예요. "나는 비범인이다"라는 이론이 살인을 정당화했어요.',
+  mk:'도스토예프스키가 제 영웅인 이유예요. 이론의 한계를 가장 잘 보여줘요. "move fast and break things"도 초인 이론이에요.'},
+290:{x:'소통',y:'침묵',line:'연락을 기다릴수록 소외가 깊어진다',
+  hj:'구르브 연락 없다는 월드컵 숨은명작편 우승이에요. 세문전 400권 중 유일한 SF라고 민경씨가 그랬죠.',
+  mk:'네, 유일한 SF예요. 소통의 부재가 유머로 변하는 순간이 문학의 힘이에요. 고객이 안 오면 웃어야 해요.'},
+301:{x:'법',y:'선',line:'법에 commit하면 선을 죽이고 선에 commit하면 법 밖으로 나간다',
+  hj:'자베르와 발장이에요. 규정을 지키면 혁신이 죽고, 혁신에 commit하면 규정 밖으로 나가요.',
+  mk:'레미제라블은 월드컵 명문장편 우승이에요. "혁명은 희망이고 오늘의 행동" — 이게 창업의 본질이에요.'},
+308:{x:'이성',y:'광기',line:'완벽한 범죄를 설계할수록 내면의 광기가 폭발한다',
+  hj:'포는 월드컵 공포편 우승이에요. 완벽한 사업 계획에 집착하면 실행이 미쳐요.',
+  mk:'심리적 공포의 효시예요. 완벽주의가 광기로 변하는 메커니즘.'},
+309:{x:'순종',y:'존엄',line:'가난한 자가 체제에 순종할수록 인간성을 잃는다',
+  hj:'보이체크는 월드컵 숨은명작편 우승이에요. 자원 없는 창업자가 시장에 순종하면 존엄을 잃어요.',
+  mk:'빈곤은 선택지를 빼앗아요. 런웨이가 1개월 남으면 모든 딜을 수락하게 돼요.'},
+344:{x:'체면',y:'진실',line:'가문의 위선을 지킬수록 진실이 폭발한다',
+  hj:'뇌우예요. 회사의 체면을 유지하려고 문제를 덮으면 결국 폭발해요.',
+  mk:'상류층 가문의 위선 아래 뇌우가 치는 것처럼, 성장 지표 아래 기술부채가 폭발해요.'},
+345:{x:'충성',y:'생존',line:'체제에 충성할수록 농촌이 황폐해진다',
+  hj:'모옌의 풍자예요. 본사 방침에 충성할수록 현장이 황폐해져요.',
+  mk:'체제에 충성하면서 동시에 비판하는 것. 모옌이 노벨상을 받은 이유예요.'},
+351:{x:'노동',y:'소외',line:'일을 할수록 인간에서 멀어진다',
+  hj:'마르크스의 소외예요. 자기 제품을 만드는데 자기가 소외되는 창업자의 역설.',
+  mk:'노동은 본래 자기실현이어야 하는데, 투자자의 KPI를 맞추는 노동은 소외예요.'},
+353:{x:'전쟁',y:'평화',line:'전쟁에서 영웅이 되겠다는 commit이 부서지면 비로소 평화가 보인다',
+  hj:'유니콘이 되겠다는 환상이 부서져야 진짜 사업이 보여요.',
+  mk:'무기여 잘 있거라의 프레더릭처럼, 전장을 떠나야 사랑이 보여요.'},
+361:{x:'혁명',y:'환멸',line:'혁명의 이상에 commit하지만 결국 혁명은 모든 자식을 잡아먹는다',
+  hj:'닥터 지바고예요. 혁명적 제품을 만들었지만 시장의 혁명이 창업자를 삼키는 것.',
+  mk:'파스테르나크의 서정이 혁명의 잔인함을 견디게 해요. 서정(=비전)이 현실의 잔혹함을 견디게 하는 것.'},
+375:{x:'구출',y:'자기발견',line:'타인을 구하러 갔다가 자기를 발견한다',
+  hj:'대사들이에요. 시장의 문제를 해결하려다가 자기의 진짜 역량을 발견하는 것.',
+  mk:'늦깎이 성장이에요. 50대에 파리에 가서 깨달은 것. 창업에 나이 제한은 없어요.'},
+399:{x:'이동',y:'정착',line:'어디에도 머물지 않으면 자유롭지만 어디에도 속하지 못한다',
+  hj:'방랑자들은 월드컵 노벨상편 우승이에요. pivot을 계속하면 자유롭지만 정체성이 없어요.',
+  mk:'토카르추크는 미래의 별자리 소설을 보여줘요. 경계를 넘는 것 자체가 가치인 시대.'},
+406:{x:'기억',y:'해방',line:'가문의 역사에 commit할수록 여성은 기록에서 지워진다',
+  hj:'세피아빛 초상은 월드컵 성장소설편 우승이에요. 조직의 역사에서 기여자가 지워지는 것.',
+  mk:'4대의 여성이 각자의 방식으로 기억과 싸워요. 조직에서도 기여가 보이지 않는 사람이 있어요.'},
+465:{x:'명료',y:'모호',line:'자기를 알려 할수록 자기가 미끄러진다',
+  hj:'카뮈의 모호함이에요. Strategic ambiguity — 너무 일찍 정의하면 가능성이 죽어요.',
+  mk:'명료함을 추구하는 것 자체가 모호함을 만들어요. dR/dF=(−)의 문학적 표현.'},
+484:{x:'일상',y:'실존',line:'파티를 준비하는 표면 아래 죽음이 흐른다',
+  hj:'댈러웨이 부인이에요. 일상의 표면(=KPI 미팅) 아래 실존적 위기(=이게 진짜 내가 원한 건가)가 흐르는 것.',
+  mk:'울프의 의식의 흐름이 보여주는 건, 사소한 일상이 가장 큰 결정을 품고 있다는 거예요.'},
+};
+
+const ilryeokVols = new Set([5,18,44,95,130,154,205,283,301,309,465,484]);
+const tvVols = new Set([13,27,65,75,104,118,153,169,248,290,308,309,344,345,375,388,399,406]);
+const worldcupWins = new Set([13,75,248,308,309,388]);
+const tensionVols = new Set(Object.keys(CAGE_TENSIONS).map(Number));
+
+const bookMap = {};
+BOOKS.forEach(b => bookMap[b.vol] = b);
+
+// ============================================================
+// MOSAIC
+// ============================================================
+function buildMosaic() {
+    const grid = document.getElementById('mosaic');
+    const frag = document.createDocumentFragment();
+    for (let i = 1; i <= 484; i++) {
+        if (i > 476 && i < 484) continue; // gap
+        const el = document.createElement('div');
+        el.className = 'cell';
+        el.dataset.vol = i;
+        const il = ilryeokVols.has(i);
+        const tv = tvVols.has(i);
+        if (il && tv) el.classList.add('cell-both');
+        else if (il) el.classList.add('cell-ilryeok');
+        else if (tv) el.classList.add('cell-tv');
+        else if (tensionVols.has(i)) el.classList.add('cell-tension');
+        else if (CATALOG[i]) el.classList.add('cell-catalog');
+        else el.classList.add('cell-empty');
+        el.textContent = i;
+        if (worldcupWins.has(i)) el.innerHTML += '<span class="crown">&#x1F451;</span>';
+        el.addEventListener('mouseenter', showTooltip);
+        el.addEventListener('mouseleave', hideTooltip);
+        el.addEventListener('click', showModal);
+        frag.appendChild(el);
+    }
+    grid.appendChild(frag);
+}
+
+// ============================================================
+// TOOLTIP
+// ============================================================
+const tip = document.getElementById('tooltip');
+function showTooltip(e) {
+    const vol = +e.target.dataset.vol;
+    const cat = CATALOG[vol];
+    if (!cat) return;
+    const book = bookMap[vol];
+    const tension = CAGE_TENSIONS[vol];
+    let html = '';
+    const cover = getCover(vol);
+    if (cover) html += `<img src="${cover}" alt="" loading="lazy">`;
+    html += `<div class="t-vol">#${String(vol).padStart(3,'0')}</div>`;
+    html += `<div class="t-title">${cat.t}</div>`;
+    html += `<div class="t-author">${cat.a}</div>`;
+    if (tension) html += `<div class="t-tension">${tension.x} vs ${tension.y}</div>`;
+    if (tension) html += `<div class="t-line">${tension.line}</div>`;
+    else if (book && book.quote) html += `<div class="t-line">"${book.quote.slice(0,60)}..."</div>`;
+    tip.innerHTML = html;
+    const r = e.target.getBoundingClientRect();
+    let left = r.right + 8;
+    let top = r.top;
+    if (left + 250 > window.innerWidth) left = r.left - 250;
+    if (top + 200 > window.innerHeight) top = window.innerHeight - 210;
+    if (top < 0) top = 4;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.classList.add('show');
+}
+function hideTooltip() { tip.classList.remove('show'); }
+
+// ============================================================
+// MODAL
+// ============================================================
+const overlay = document.getElementById('modalOverlay');
+const modal = document.getElementById('modal');
+overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+
+function showModal(e) {
+    const vol = +e.currentTarget.dataset.vol;
+    const cat = CATALOG[vol];
+    if (!cat) return;
+    const book = bookMap[vol];
+    const tension = CAGE_TENSIONS[vol];
+    const cover = getCover(vol);
+    let html = '';
+    if (cover) html += `<div style="text-align:center;margin-bottom:12px"><img src="${cover}" alt="" style="height:160px;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.4)" loading="lazy"></div>`;
+    html += `<h2>#${String(vol).padStart(3,'0')} ${cat.t}</h2><div class="m-author">${cat.a}</div>`;
+
+    if (book) {
+        const pat = PATTERNS.find(p => p.id === book.pattern);
+        html += `<div class="m-section"><div class="m-label">비극 패턴</div><div class="m-pattern">${book.pattern} — ${pat ? pat.line : ''}</div><div class="m-tragedy">${book.tragedy}</div>`;
+        if (pat && pat.startup) html += `<div style="font-size:12px;color:var(--gold);margin-top:6px;padding:6px 8px;background:rgba(255,215,0,0.08);border-radius:4px">💡 ${pat.startup}</div>`;
+        html += `</div>`;
+        // TV episodes
+        if (book.tv) {
+            html += `<div class="m-section"><div class="m-label">민음사TV</div>`;
+            const eps = EPISODES.filter(ep => ep.works.some(w => w.vol === vol));
+            eps.forEach(ep => {
+                const w = ep.works.find(w2 => w2.vol === vol);
+                const medal = w && w.result === '우승' ? '🏆' : w && w.result === '준우승' ? '🥈' : '';
+                html += `<div class="m-tv-item"><span class="medal">${medal}</span>EP.${ep.num} ${ep.theme}${w && w.result ? ' ('+w.result+')' : ''}</div>`;
+            });
+            if (book.tv.comment) html += `<div style="font-size:12px;color:var(--dim);margin-top:4px">${book.tv.comment}</div>`;
+            html += `</div>`;
+        }
+        if (book.quote) html += `<div class="m-section"><div class="m-label">인용구</div><div class="m-quote">"${book.quote}"</div></div>`;
+        if (book.memo) html += `<div class="m-section"><div class="m-label">독자 메모</div><div class="m-memo">${book.memo}</div></div>`;
+    }
+
+    if (tension) {
+        html += `<div class="m-section"><div class="m-label">Commitment vs Freedom</div><div class="m-tension">${tension.x} vs ${tension.y}</div><div style="font-size:13px;color:var(--text2);margin-top:6px">${tension.line}</div>`;
+        if (tension.hj) html += `<div style="margin-top:8px;padding:6px 8px;background:rgba(200,162,200,0.1);border-radius:4px;font-size:12px"><span style="color:var(--rose);font-weight:600">혜진</span> <span style="color:var(--text2)">${tension.hj}</span></div>`;
+        if (tension.mk) html += `<div style="margin-top:4px;padding:6px 8px;background:rgba(100,180,255,0.08);border-radius:4px;font-size:12px"><span style="color:var(--sky);font-weight:600">민경</span> <span style="color:var(--text2)">${tension.mk}</span></div>`;
+        html += `</div>`;
+    }
+
+    html += `<button class="m-close" onclick="document.getElementById('modalOverlay').classList.remove('show')">닫기</button>`;
+    modal.innerHTML = html;
+    overlay.classList.add('show');
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+let quizState = JSON.parse(localStorage.getItem('iceberg_quiz') || '{"correct":0,"total":0,"solved":{}}');
+const quizToggle = document.getElementById('quizToggle');
+const quizArea = document.getElementById('quizArea');
+const quizNext = document.getElementById('quizNext');
+let quizAnswered = false;
+
+quizToggle.addEventListener('click', () => {
+    quizArea.classList.toggle('active');
+    if (quizArea.classList.contains('active')) {
+        quizToggle.textContent = '퀴즈 접기';
+        nextQuestion();
+    } else {
+        quizToggle.textContent = '📖 5개월 커리큘럼에서 이 책은 몇 월? — 퀴즈 시작';
+    }
+});
+quizNext.addEventListener('click', () => { quizNext.style.display='none'; nextQuestion(); });
+
+function nextQuestion() {
+    quizAnswered = false;
+    const book = BOOKS[Math.floor(Math.random() * BOOKS.length)];
+    const qDiv = document.getElementById('quizQ');
+    const coverUrl = getCover(book.vol);
+    qDiv.innerHTML = `<div class="quiz-q-title">이 책의 비극 패턴은?</div>`
+        + (coverUrl ? `<img src="${coverUrl}" style="height:80px;border-radius:4px;float:left;margin-right:12px;margin-bottom:4px" loading="lazy">` : '')
+        + `<div class="quiz-q-book">#${book.vol} ${book.title}</div><div class="quiz-q-author">${book.author}</div><div style="clear:both"></div><div id="qTragedy" style="display:none;font-size:13px;color:var(--rose);margin-top:8px"></div>`;
+
+    const correct = PATTERNS.find(p => p.id === book.pattern);
+    const wrong = PATTERNS.filter(p => p.id !== book.pattern).sort(() => Math.random() - 0.5).slice(0,3);
+    const opts = [correct, ...wrong].sort(() => Math.random() - 0.5);
+
+    const optsDiv = document.getElementById('quizOpts');
+    optsDiv.innerHTML = '';
+    opts.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt';
+        btn.textContent = `${p.id} — ${p.line}`;
+        btn.dataset.id = p.id;
+        btn.addEventListener('click', () => answer(btn, book, correct.id));
+        optsDiv.appendChild(btn);
+    });
+    updateScore();
+}
+
+function answer(btn, book, correctId) {
+    if (quizAnswered) return;
+    quizAnswered = true;
+    quizState.total++;
+    const isCorrect = btn.dataset.id === correctId;
+    if (isCorrect) {
+        quizState.correct++;
+        quizState.solved[book.vol] = true;
+        btn.classList.add('correct');
+        // mark cell
+        const cell = document.querySelector(`.cell[data-vol="${book.vol}"]`);
+        if (cell && !cell.querySelector('.check')) cell.innerHTML += '<span class="check">✓</span>';
+    } else {
+        btn.classList.add('wrong');
+        document.querySelectorAll('.quiz-opt').forEach(b => { if (b.dataset.id === correctId) b.classList.add('reveal'); });
+    }
+    const tEl = document.getElementById('qTragedy');
+    tEl.textContent = book.tragedy;
+    tEl.style.display = 'block';
+    localStorage.setItem('iceberg_quiz', JSON.stringify(quizState));
+    quizNext.style.display = 'block';
+    updateScore();
+}
+
+function updateScore() {
+    const rate = quizState.total ? Math.round(quizState.correct / quizState.total * 100) : 0;
+    document.getElementById('quizScore').textContent = quizState.total ? `${quizState.correct}/${quizState.total} (${rate}%)` : '';
+}
+
+// ============================================================
+// INIT
+// ============================================================
+buildMosaic();
+// restore solved marks
+Object.keys(quizState.solved).forEach(v => {
+    const cell = document.querySelector(`.cell[data-vol="${v}"]`);
+    if (cell && !cell.querySelector('.check')) cell.innerHTML += '<span class="check">✓</span>';
+});
+</script>
+</body>
+</html>
